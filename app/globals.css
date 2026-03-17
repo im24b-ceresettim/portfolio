@@ -1,45 +1,85 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: white;
+  color: black;
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.5s ease, color 0.5s ease-in, color 0.5s ease-in;
+
+}
+
+html.dark body {
+    background: black;
+    color: white;
+}
+
+nav {
+  display: flex;
+  position: sticky;
+  background: white;
+  top: 0;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom-width: 1px;
+  border-color: black;
+}
+
+html.dark nav {
+  background: black;
+  border-color: white;
 }
 
 nav a {
   padding: 20px;
-  border-right: 1px black;
-  border-style: dashed;
+  background: white;
+  border-right: 1px dashed black;
   align-content: center;
+  color: black;
 }
+
+html.dark nav a {
+  background: black;
+  border-color: white;
+  color: white;
+}
+
 nav a:hover {
   color: white;
   background-color: black;
 }
 
+html.dark nav a:hover {
+  background: white;
+  color: black;
+}
+
 .sun-div {
+  cursor: pointer;
 }
 
 .sun {
   display: block;
 }
 
+html.dark .sun {
+  filter: invert(1);
+}
+
 .sun-outline {
   display: none;
 }
 
-.sun-div:hover .sun {
+.sun-div[data-hover-disabled="false"]:hover .sun {
   display: none;
 }
 
-.sun-div:hover .sun-outline {
+.sun-div[data-hover-disabled="false"]:hover .sun-outline {
   display: block;
+}
+
+html.dark .sun-div[data-hover-disabled="false"]:hover .sun-outline {
+  filter: invert(1);
 }
 
 .sun.hidden {
@@ -50,10 +90,18 @@ nav a:hover {
   display: block;
 }
 
-.sun-div:hover .sun.hidden {
+html.dark .sun-outline.hidden {
+  filter: invert(1);
+}
+
+.sun-div[data-hover-disabled="false"]:hover .sun.hidden {
   display: block;
 }
 
-.sun-div:hover .sun-outline.hidden {
+html.dark .sun-div[data-hover-disabled="false"]:hover .sun.hidden {
+  filter: invert(1);
+}
+
+.sun-div[data-hover-disabled="false"]:hover .sun-outline.hidden {
   display: none;
 }
