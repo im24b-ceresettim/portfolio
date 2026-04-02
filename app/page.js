@@ -2,7 +2,7 @@ import { portfolioData, projects } from './portfolioData';
 
 export default function Home() {
   return (
-    <main className="portfolio-scroll">
+    <main>
       <section id="home" className="page-section">
         <div className="section-inner">
           <p className="section-tag">Portfolio</p>

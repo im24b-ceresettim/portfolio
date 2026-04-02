@@ -1,10 +1,6 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   background: white;
   color: black;
@@ -83,14 +79,9 @@ html.dark .nav-link[aria-current="page"] {
   color: black !important;
 }
 
-.portfolio-scroll {
-  scroll-snap-type: y mandatory;
-}
 
 .page-section {
   min-height: calc(100vh - 64px);
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
   display: flex;
   align-items: center;
   padding: 2.5rem 1.25rem;
