@@ -3,7 +3,6 @@
 import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
-import UniverseBackground from "./components/UniverseBackground";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const navItems = [
@@ -17,8 +16,6 @@ const navItems = [
 export default function RootLayout({ children }) {
     const [showSun,setShowSun] = useState(true);
     const [lightmode, setLightmode] = useState(true);
-    const [backgroundMode, setBackgroundMode] = useState("auto");
-    const [performanceMode, setPerformanceMode] = useState(false);
     const [isHoverDisabled, setIsHoverDisabled] = useState(false);
     const [activeSection, setActiveSection] = useState(() => {
         if (typeof window === "undefined") {
@@ -225,84 +222,49 @@ export default function RootLayout({ children }) {
         setIsHoverDisabled(false);
     };
 
-    const cycleBackgroundMode = () => {
-        setBackgroundMode((current) => {
-            if (current === "auto") {
-                return "on";
-            }
-
-            if (current === "on") {
-                return "off";
-            }
-
-            return "auto";
-        });
-    };
-
-    const isUniverseEnabled = backgroundMode === "on" || (backgroundMode === "auto" && !lightmode);
-    const backgroundLabel = backgroundMode === "auto"
-        ? "BG: Dark only"
-        : backgroundMode === "on"
-            ? "BG: On"
-            : "BG: Off";
-
   return (
     <html lang="en" className={lightmode ? "light" : "dark"}>
       <body>
-        <UniverseBackground enabled={isUniverseEnabled} performanceMode={performanceMode} />
-        <div className="content-layer">
-            <nav>
-                <div className="flex nav-links">
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.id}
-                            className={`block nav-link ${activeSection === item.id ? "active" : ""}`}
-                            href={item.href}
-                            onClick={(event) => handleNavClick(event, item)}
-                            aria-current={activeSection === item.id ? "page" : undefined}
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
-                </div>
-
-                <div className="nav-controls">
-                    <button type="button" className="nav-control-btn" onClick={cycleBackgroundMode}>
-                        {backgroundLabel}
-                    </button>
-                    <button
-                        type="button"
-                        className="nav-control-btn"
-                        onClick={() => setPerformanceMode((value) => !value)}
+        <nav>
+            <div className="flex nav-links">
+                {navItems.map((item) => (
+                    <Link
+                        key={item.id}
+                        className={`block nav-link ${activeSection === item.id ? "active" : ""}`}
+                        href={item.href}
+                        onClick={(event) => handleNavClick(event, item)}
+                        aria-current={activeSection === item.id ? "page" : undefined}
                     >
-                        Performance: {performanceMode ? "On" : "Off"}
-                    </button>
+                        {item.label}
+                    </Link>
+                ))}
+            </div>
 
-                    <div
-                        className="sun-div"
-                        onMouseLeave={handleMouseLeave}
-                        data-hover-disabled={isHoverDisabled}>
-                        <Image
-                            className={showSun ? "sun" : "sun hidden"}
-                            src="/sun.png"
-                            alt="sun"
-                            width={40}
-                            height={40}
-                            onClick={handleClick}
-                        />
-                        <Image
-                        className={showSun ? "sun-outline" : "sun-outline hidden"}
-                        src="/sun-outline.png"
+            <div className="nav-controls">
+                <div
+                    className="sun-div"
+                    onMouseLeave={handleMouseLeave}
+                    data-hover-disabled={isHoverDisabled}>
+                    <Image
+                        className={showSun ? "sun" : "sun hidden"}
+                        src="/sun.png"
                         alt="sun"
                         width={40}
                         height={40}
                         onClick={handleClick}
-                        />
-                    </div>
+                    />
+                    <Image
+                    className={showSun ? "sun-outline" : "sun-outline hidden"}
+                    src="/sun-outline.png"
+                    alt="sun"
+                    width={40}
+                    height={40}
+                    onClick={handleClick}
+                    />
                 </div>
-            </nav>
-            {children}
-        </div>
+            </div>
+        </nav>
+        {children}
       </body>
     </html>
   );
