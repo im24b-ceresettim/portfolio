@@ -24,7 +24,6 @@ export default function RootLayout({ children }) {
   const activeSectionRef = useRef("home");
   const isAutoScrollingRef = useRef(false);
   const animationFrameRef = useRef(null);
-  const wheelCooldownRef = useRef(null);
 
   useEffect(() => {
     activeSectionRef.current = activeSection;
@@ -58,7 +57,7 @@ export default function RootLayout({ children }) {
 
     const startY = window.scrollY;
     const targetY = targetSection.getBoundingClientRect().top + window.scrollY;
-    const duration = 900;
+    const duration = 350;
     const startTime = performance.now();
 
     const step = (now) => {
@@ -134,41 +133,20 @@ export default function RootLayout({ children }) {
       smoothScrollToSection(nextId);
     };
 
-    const unlockWheelGesture = () => {
-      if (wheelCooldownRef.current) {
-        window.clearTimeout(wheelCooldownRef.current);
-      }
-
-      // Unlock only after wheel activity has been quiet for a moment.
-      wheelCooldownRef.current = window.setTimeout(() => {
-        wheelCooldownRef.current = null;
-      }, 450);
-    };
-
     const handleWheel = (event) => {
       if (Math.abs(event.deltaY) < 1) return;
 
       event.preventDefault();
 
-      // One gesture -> one section. Momentum events only extend the lock.
-      if (wheelCooldownRef.current) {
-        unlockWheelGesture();
-        return;
-      }
-
       if (isAutoScrollingRef.current) return;
 
       moveOneSection(event.deltaY > 0 ? "down" : "up");
-      unlockWheelGesture();
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
 
     return () => {
       window.removeEventListener("wheel", handleWheel, { passive: false });
-      if (wheelCooldownRef.current) {
-        window.clearTimeout(wheelCooldownRef.current);
-      }
       stopAnimation();
     };
   }, [smoothScrollToSection, stopAnimation]);
