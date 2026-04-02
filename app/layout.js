@@ -57,13 +57,14 @@ export default function RootLayout({ children }) {
 
     const startY = window.scrollY;
     const targetY = targetSection.getBoundingClientRect().top + window.scrollY;
-    const duration = 350;
+    const duration = 500;
     const startTime = performance.now();
 
     const step = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      window.scrollTo(0, startY + (targetY - startY) * progress);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo(0, startY + (targetY - startY) * easedProgress);
 
       if (progress < 1) {
         animationFrameRef.current = window.requestAnimationFrame(step);
