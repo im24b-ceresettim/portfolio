@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import UniverseBackground from "./components/UniverseBackground";
 
 const navItems = [
   { id: "home", label: "home", href: "/" },
@@ -172,6 +173,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={lightmode ? "light" : "dark"}>
       <body>
+        <UniverseBackground enabled={!lightmode} />
+        <div className="content-layer">
         <nav>
           <div className="flex nav-links">
             {navItems.map((item) => (
@@ -213,6 +216,7 @@ export default function RootLayout({ children }) {
           </div>
         </nav>
         {children}
+        </div>
       </body>
     </html>
   );

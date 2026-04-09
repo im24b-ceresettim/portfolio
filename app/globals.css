@@ -1,6 +1,35 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+html.dark {
+  --surface-glass-bg: rgba(7, 7, 9, 0.52);
+  --surface-glass-border: rgba(255, 255, 255, 0.9);
+}
+
+:root {
+  --section-overlay-light: rgba(255, 255, 255, 0.58);
+}
+
+.universe-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.universe-canvas.is-visible {
+  opacity: 1;
+}
+
+.content-layer {
+  position: relative;
+  z-index: 2;
+}
+
 body {
   background: white;
   color: black;
@@ -22,7 +51,7 @@ nav {
   justify-content: space-between;
   border-bottom-width: 1px;
   border-color: black;
-  z-index: 20;
+  z-index: 30;
 }
 
 .nav-links {
@@ -37,8 +66,9 @@ nav {
 }
 
 html.dark nav {
-  background: black;
-  border-color: white;
+  background: #000000;
+  border-color: #ffffff;
+  backdrop-filter: none;
 }
 
 
@@ -85,11 +115,11 @@ html.dark .nav-link[aria-current="page"] {
   display: flex;
   align-items: center;
   padding: 2.5rem 1.25rem;
-  background: rgba(255, 255, 255, 0.62);
+  background: var(--section-overlay-light);
 }
 
 html.dark .page-section {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.5));
+  background: var(--surface-glass-bg);
 }
 
 .section-inner {
@@ -135,8 +165,8 @@ h2 {
 }
 
 html.dark .project-card {
-  border-color: white;
-  background: #111;
+  border-color: var(--surface-glass-border);
+  background: var(--surface-glass-bg);
 }
 
 .project-card h3 {
@@ -177,8 +207,8 @@ html.dark .project-card .stack {
 }
 
 html.dark .contact-card {
-  border-color: white;
-  background: #111;
+  border-color: var(--surface-glass-border);
+  background: var(--surface-glass-bg);
 }
 
 .sun-div {

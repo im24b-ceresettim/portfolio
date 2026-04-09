@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Portfolio
 
-## Getting Started
+This project is a Next.js portfolio with a dark-mode Babylon.js background scene.
 
-First, run the development server:
+## Features
+
+- Multi-section one-page portfolio layout
+- Theme toggle with light/dark mode
+- Dark-mode animated universe background with Saturn and dense starfield
+- Section-by-section scroll navigation and active nav highlighting
+
+## Run Locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Build Check
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
 
-## Learn More
+## Where To Edit
 
-To learn more about Next.js, take a look at the following resources:
+- Layout and navigation: `app/layout.js`
+- Background scene: `app/components/UniverseBackground.jsx`
+- Main content sections: `app/page.js`
+- Global styles: `app/globals.css`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## High-Quality Texture Setup (Dark Mode Universe)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Place your highest-quality files in `public/textures` using these names:
 
-## Deploy on Vercel
+- `saturn_albedo_16k.jpg` (or `saturn_albedo_8k.jpg`)
+- `saturn_bump_8k.jpg` (or `saturn_normal_8k.jpg`)
+- `saturn_ring_color_8k.png`
+- `saturn_ring_alpha_8k.png`
+- `stars_16k.jpg` (or `stars_8k.jpg`)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The scene automatically tries the highest-quality names first and falls back to lower-quality or procedural textures.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Suggested sources:
+
+- Solar System Scope textures
+- NASA / USGS planetary data
+- Poly Haven (for star backgrounds)
+
+Always verify the license of each downloaded file before publishing.
+
