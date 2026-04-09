@@ -238,10 +238,11 @@ export default function UniverseBackground({ darkMode }) {
     scene.add(backFill);
 
     const saturnGeom = new THREE.SphereGeometry(SATURN_R, 128, 64);
-    const saturnTex = createSaturnTexture();
+    const saturnAlbedo = new THREE.TextureLoader().load('/textures/saturn_albedo_8k.jpg');
+    saturnAlbedo.colorSpace = THREE.SRGBColorSpace;
     const saturnBump = createSaturnBumpTexture();
     const saturnMat = new THREE.MeshStandardMaterial({
-      map: saturnTex,
+      map: saturnAlbedo,
       bumpMap: saturnBump,
       bumpScale: 0.015,
       roughness: 0.88,
