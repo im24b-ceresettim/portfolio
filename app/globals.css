@@ -2,12 +2,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 html.dark {
-  --surface-glass-bg: rgba(7, 7, 9, 0.52);
+  --surface-glass-bg: rgba(7, 7, 9, 0.34);
   --surface-glass-border: rgba(255, 255, 255, 0.9);
 }
 
 :root {
-  --section-overlay-light: rgba(255, 255, 255, 0.58);
+  --section-overlay-light: rgba(255, 255, 255, 0.38);
 }
 
 .universe-canvas {
@@ -45,7 +45,7 @@ html.dark body {
 nav {
   display: flex;
   position: sticky;
-  background: white;
+  background: rgba(255, 255, 255, 0.8);
   top: 0;
   align-items: center;
   justify-content: space-between;
@@ -66,7 +66,7 @@ nav {
 }
 
 html.dark nav {
-  background: #000000;
+  background: rgba(0, 0, 0, 0.76);
   border-color: #ffffff;
   backdrop-filter: none;
 }
@@ -212,7 +212,7 @@ h2 {
   border: 1px solid black;
   border-radius: 10px;
   padding: 1rem;
-  background: #f7f7f7;
+  background: rgba(247, 247, 247, 0.58);
 }
 
 html.dark .project-card {
@@ -263,7 +263,7 @@ html.dark .contact-card a:visited {
   border-radius: 10px;
   padding: 1rem;
   max-width: 760px;
-  background: #f7f7f7;
+  background: rgba(247, 247, 247, 0.58);
 }
 
 html.dark .contact-card {
