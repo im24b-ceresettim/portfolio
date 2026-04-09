@@ -1,36 +1,29 @@
 export const portfolioData = {
-  name: 'Your Name',
-  role: 'FullStack Developer Intern',
+  name: 'Matteo Ceresetti',
+  role: 'Informatiker EFZ Applikationsentwicklung (Lehrstart August 2027)',
   headline:
-    'I am a Software Engineering student focused on building reliable and user-friendly web applications. I am currently seeking a FullStack Developer Intern role where I can contribute to real products, strengthen my engineering fundamentals, and collaborate in a professional team environment.',
+    'Ich besuche aktuell das zweite Jahr an der KSH Hottingen und suche eine Lehrstelle als Informatiker EFZ Applikationsentwicklung mit Start im August 2027. Ich arbeite strukturiert, zuverlässig und mit hoher Motivation, meine Fähigkeiten in einem professionellen Umfeld weiterzuentwickeln.',
   about:
-    'My work combines frontend implementation with backend fundamentals, with a strong focus on clean structure, readable code, and practical problem-solving. I enjoy turning ideas into clear, maintainable solutions and continuously improving through feedback and hands-on project work.',
-  email: 'your.email@example.com',
-  linkedin: 'https://www.linkedin.com/in/your-profile',
-  github: 'https://github.com/your-username',
+    'Meine schulischen Schwerpunkte liegen in Informatik, Mathematik, Englisch, Französisch sowie Technik und Umwelt. Ich spreche Deutsch, Französisch, Spanisch, Englisch und Italienisch (Muttersprache, B2-Diplom). Technisch arbeite ich mit Spring Boot, Java, MySQL, PostgreSQL, Next.js, Node.js, React, Tailwind und Docker Desktop. Zusätzlich habe ich SCRUM-Grundlagen gelernt, arbeite effizient mit KI-Tools und bringe Teamgeist, Ruhe und Entschlossenheit mit. In meiner Freizeit spiele ich Fussball und trainiere Karate (blauer Gurt).',
+  phone: '078 247 44 53',
+  email: 'mat.cerelappo@gmail.com',
+  github: 'https://github.com/im24b-ceresettim',
+  profileImage: '/profile-placeholder.svg',
 };
 
 export const projects = [
   {
-    title: 'Portfolio Website',
+    title: 'SBB-Lore',
     description:
-      'A personal portfolio built with Next.js to present profile, projects, and contact details in a professional format.',
-    stack: 'Next.js, React, CSS',
-    url: 'https://github.com/your-username/portfolio',
+      'Gruppenprojekt mit zwei Mitschuelern ueber die Geschichte der Schweiz. Die Anwendung praesentiert Inhalte interaktiv und strukturiert in einer klaren Weboberflaeche.',
+    stack: 'JavaScript, HTML, CSS, Leaflet',
+    url: '#',
   },
   {
-    title: 'Team Course Project',
+    title: 'Java WouldYouRather-Spiel',
     description:
-      'A collaborative project developed during coursework with shared planning, implementation, and delivery responsibilities.',
-    stack: 'JavaScript, HTML, CSS',
-    url: 'https://github.com/your-username/team-course-project',
-  },
-  {
-    title: 'Practice FullStack App',
-    description:
-      'A practice application used to improve component structure, state handling, and backend integration basics.',
-    stack: 'React, Node.js',
-    url: 'https://github.com/your-username/practice-fullstack-app',
+      'Kleines Java-Projekt zur Uebung von Logik, Struktur und sauberer Umsetzung einer interaktiven Spielidee.',
+    stack: 'Java',
+    url: '#',
   },
 ];
-

@@ -71,7 +71,6 @@ html.dark nav {
   backdrop-filter: none;
 }
 
-
 .nav-link {
   padding: 20px;
   background: white;
@@ -109,7 +108,6 @@ html.dark .nav-link[aria-current="page"] {
   color: black !important;
 }
 
-
 .page-section {
   min-height: calc(100vh - 64px);
   display: flex;
@@ -128,12 +126,65 @@ html.dark .page-section {
   margin: 0 auto;
 }
 
+.home-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.home-copy {
+  flex: 1;
+}
+
+.profile-placeholder {
+  width: 220px;
+  height: 220px;
+  border: 2px dashed black;
+  border-radius: 14px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  overflow: hidden;
+}
+
+.profile-placeholder-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+html.dark .profile-placeholder {
+  border-color: white;
+  background: black;
+  color: white;
+}
+
+@media (max-width: 840px) {
+  .home-layout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-placeholder {
+    width: 180px;
+    height: 180px;
+  }
+}
+
 .section-tag {
   margin-bottom: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
-  color: #16a34a;
+  color: black;
+}
+
+html.dark .section-tag {
+  color: white;
 }
 
 .section-lead {
@@ -178,19 +229,28 @@ html.dark .project-card {
 }
 
 .project-card .stack {
-  color: #14532d;
+  color: black;
   font-weight: 700;
 }
 
 html.dark .project-card .stack {
-  color: #86efac;
+  color: white;
 }
 
 .project-card a,
-.contact-card a {
-  color: #16a34a;
+.project-card a:visited,
+.contact-card a,
+.contact-card a:visited {
+  color: black;
   font-weight: 700;
   text-decoration: none;
+}
+
+html.dark .project-card a,
+html.dark .project-card a:visited,
+html.dark .contact-card a,
+html.dark .contact-card a:visited {
+  color: white;
 }
 
 .project-card a:hover,

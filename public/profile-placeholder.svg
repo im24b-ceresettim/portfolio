@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Profilbild Platzhalter">
+  <rect width="400" height="400" fill="#ffffff"/>
+  <rect x="8" y="8" width="384" height="384" rx="20" ry="20" fill="none" stroke="#000000" stroke-width="16" stroke-dasharray="18 14"/>
+  <circle cx="200" cy="145" r="62" fill="none" stroke="#000000" stroke-width="14"/>
+  <path d="M96 324c12-62 52-96 104-96s92 34 104 96" fill="none" stroke="#000000" stroke-width="14" stroke-linecap="round"/>
+</svg>
+
