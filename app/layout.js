@@ -173,7 +173,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={lightmode ? "light" : "dark"}>
       <body>
-        <UniverseBackground enabled={!lightmode} />
+        <UniverseBackground darkMode={!lightmode} />
         <div className="content-layer">
         <nav>
           <div className="flex nav-links">
