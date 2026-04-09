@@ -300,8 +300,8 @@ export default function UniverseBackground({ darkMode }) {
       frameId = requestAnimationFrame(animate);
       const dt = clock.getDelta();
 
-      saturn.rotation.y += dt * 0.05;
-      ring.rotation.z += dt * 0.008;
+      saturn.rotation.y -= dt * 0.05;
+      ring.rotation.z -= dt * 0.05;
       stars.rotation.y += dt * 0.002;
 
       camera.position.x +=
