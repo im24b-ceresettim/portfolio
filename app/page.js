@@ -7,7 +7,7 @@ export default function Home() {
       <section id="home" className="page-section">
         <div className="section-inner home-layout">
           <div className="home-copy">
-            <p className="section-tag">Portfolio</p>
+            <p className="section-tag">Home</p>
             <h1>{portfolioData.name}</h1>
             <h2>{portfolioData.role}</h2>
             <p className="section-lead">{portfolioData.headline}</p>
@@ -26,26 +26,35 @@ export default function Home() {
 
       <section id="projects" className="page-section">
         <div className="section-inner">
-          <p className="section-tag">Projekte</p>
+          <p className="section-tag">Projects</p>
           <h2>Ausgewaehlte Arbeiten</h2>
           <div className="project-grid">
-            {projects.map((project) => (
-              <article className="project-card" key={project.title}>
-                <h3>{project.title}</h3>
-                <p>{project.description}</p>
-                <p className="stack">Tech-Stack: {project.stack}</p>
-                <a href={project.url} target="_blank" rel="noreferrer">
-                  Projekt ansehen
-                </a>
-              </article>
-            ))}
+            {projects.map((project) => {
+              const hasGh = project.gh && project.gh !== '#';
+              const hasUrl = project.url && project.url !== '#';
+
+              return (
+                <article className="project-card" key={project.title}>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <p className="stack">Tech-Stack: {project.stack}</p>
+                  {hasGh && (
+                    <a href={project.gh} target="_blank" rel="noreferrer">Github ansehen</a>
+                  )}
+                  {hasGh && hasUrl && <br />}
+                  {hasUrl && (
+                    <a href={project.url} target="_blank" rel="noreferrer">Projekt ansehen</a>
+                  )}
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
 
       <section id="about-me" className="page-section">
         <div className="section-inner">
-          <p className="section-tag">Ueber mich</p>
+          <p className="section-tag">about me</p>
           <h2>Profil</h2>
           <p className="section-lead">{portfolioData.about}</p>
         </div>
@@ -53,7 +62,7 @@ export default function Home() {
 
       <section id="contact" className="page-section">
         <div className="section-inner">
-          <p className="section-tag">Kontakt</p>
+          <p className="section-tag">contact</p>
           <h2>Kontaktaufnahme</h2>
           <div className="contact-card">
             <p>

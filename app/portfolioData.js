@@ -17,13 +17,15 @@ export const projects = [
     description:
       'Gruppenprojekt mit zwei Mitschuelern ueber die Geschichte der Schweiz. Die Anwendung praesentiert Inhalte interaktiv und strukturiert in einer klaren Weboberflaeche.',
     stack: 'JavaScript, HTML, CSS, Leaflet',
-    url: '#',
+    gh: 'https://github.com/IM23a-braendlim/SBB_Lore',
+    url: 'https://sbb-lore.vercel.app/',
   },
   {
     title: 'Java WouldYouRather-Spiel',
     description:
-      'Kleines Java-Projekt zur Uebung von Logik, Struktur und sauberer Umsetzung einer interaktiven Spielidee.',
+      'Kleines Java-Projekt zur Übung von Logik, Struktur und sauberer Umsetzung einer interaktiven Spielidee.',
     stack: 'Java',
+    gh: 'https://github.com/im24b-antonyd/would-you-rather',
     url: '#',
   },
 ];
