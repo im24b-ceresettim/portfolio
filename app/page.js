@@ -74,6 +74,41 @@ export default function Home() {
           <p className="section-tag">about me</p>
           <h2>Profil</h2>
           <p className="section-lead">{portfolioData.about}</p>
+
+          <div className="skills-container">
+            <div className="skills-section">
+              <h3 className="skills-title">Sprachen</h3>
+              <div className="skills-grid">
+                {portfolioData.languages.map(lang => (
+                  <div key={lang.name} className="skill-item">
+                    <img
+                      src={`https://flagcdn.com/w40/${lang.flag}.png`}
+                      alt={`${lang.name} flag`}
+                      className="skill-icon flag-icon"
+                    />
+                    <span className="skill-name">{lang.name}</span>
+                    {lang.level && <span className="skill-level">{lang.level}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="skills-section">
+              <h3 className="skills-title">Technologien</h3>
+              <div className="skills-grid tech-grid">
+                {portfolioData.techSkills.map(skill => (
+                  <div key={skill.name} className="skill-item">
+                    <img
+                      src={`https://skillicons.dev/icons?i=${skill.icon}`}
+                      alt={`${skill.name} icon`}
+                      className="skill-icon"
+                    />
+                    <span className="skill-name">{skill.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

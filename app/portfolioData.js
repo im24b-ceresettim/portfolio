@@ -4,11 +4,29 @@ export const portfolioData = {
   headline:
     'Ich besuche aktuell das zweite Jahr an der KSH Hottingen und suche eine Lehrstelle als Informatiker EFZ Applikationsentwicklung mit Start im August 2027. Ich arbeite strukturiert, zuverlässig und mit hoher Motivation, meine Fähigkeiten in einem professionellen Umfeld weiterzuentwickeln.',
   about:
-    'Meine schulischen Schwerpunkte liegen in Informatik, Mathematik, Englisch, Französisch sowie Technik und Umwelt. Ich spreche Deutsch, Französisch, Spanisch, Englisch und Italienisch (Muttersprache, B2-Diplom). Technisch arbeite ich mit Spring Boot, Java, MySQL, PostgreSQL, Next.js, Node.js, React, Tailwind und Docker Desktop. Zusätzlich habe ich SCRUM-Grundlagen gelernt, arbeite effizient mit KI-Tools und bringe Teamgeist, Ruhe und Entschlossenheit mit. In meiner Freizeit spiele ich Fussball und trainiere Karate (blauer Gurt).',
+    'Meine schulischen Schwerpunkte liegen in Informatik, Mathematik, Englisch, Französisch sowie Technik und Umwelt. Ich habe SCRUM-Grundlagen gelernt, arbeite effizient mit KI-Tools und bringe Teamgeist, Ruhe und Entschlossenheit mit. In meiner Freizeit spiele ich Fussball und trainiere Karate (blauer Gurt).',
   phone: '078 247 44 53',
   email: 'mat.cerelappo@gmail.com',
   github: 'https://github.com/im24b-ceresettim',
   profileImage: '/profile-placeholder.svg',
+  languages: [
+    { name: 'Italienisch', level: 'C2 (Diplom: B2)', flag: 'it' },
+    { name: 'Deutsch', level: 'B2', flag: 'de' },
+    { name: 'Englisch', level: 'B2', flag: 'gb' },
+    { name: 'Französisch', level: 'B1', flag: 'fr' },
+    { name: 'Spanisch', level: 'B1', flag: 'es' },
+  ],
+  techSkills: [
+    { name: 'Java', icon: 'java' },
+    { name: 'Spring', icon: 'spring' },
+    { name: 'MySQL', icon: 'mysql' },
+    { name: 'PostgreSQL', icon: 'postgres' },
+    { name: 'React', icon: 'react' },
+    { name: 'Next.js', icon: 'nextjs' },
+    { name: 'Node.js', icon: 'nodejs' },
+    { name: 'Tailwind CSS', icon: 'tailwind' },
+    { name: 'Docker', icon: 'docker' },
+  ],
 };
 
 export const projects = [

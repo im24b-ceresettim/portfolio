@@ -362,6 +362,129 @@ html.dark .project-btn.live-btn:hover {
 .btn-icon {
   flex-shrink: 0;
 }
+
+.skills-container {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+}
+
+@media (min-width: 768px) {
+  .skills-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4rem;
+  }
+}
+
+.skills-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.75rem;
+}
+
+html.dark .skills-title {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+}
+
+.skills-grid.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.skills-grid.tech-grid .skill-item {
+  width: 100%;
+}
+
+.skills-grid.tech-grid .skill-name {
+  white-space: nowrap;
+}
+
+.skills-grid.tech-grid .skill-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.skills-grid.tech-grid {
+  align-items: start;
+}
+
+.skills-grid.tech-grid .skill-item {
+  justify-content: flex-start;
+}
+
+@media (max-width: 720px) {
+  .skills-grid.tech-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .skills-grid.tech-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+html.dark .skill-item {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.skill-item:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.dark .skill-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skill-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.flag-icon {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.skill-name {
+  font-weight: 600;
+}
+
+.skill-level {
+  font-size: 0.8rem;
+  color: #666;
+  background: rgba(0,0,0,0.05);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+html.dark .skill-level {
+  color: #aaa;
+  background: rgba(255,255,255,0.1);
+}
+
 .contact-card a,
 .contact-card a:visited {
   color: black;
