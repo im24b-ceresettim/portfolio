@@ -15,7 +15,7 @@ export const projects = [
   {
     title: 'SBB-Lore',
     description:
-      'Gruppenprojekt mit zwei Mitschuelern ueber die Geschichte der Schweiz. Die Anwendung praesentiert Inhalte interaktiv und strukturiert in einer klaren Weboberflaeche.',
+      'Gruppenprojekt mit zwei Mitschülern über die Geschichte der Schweiz. Die Anwendung präsentiert Inhalte interaktiv und strukturiert in einer klaren Weboberfläche.',
     stack: 'JavaScript, HTML, CSS, Leaflet',
     gh: 'https://github.com/IM23a-braendlim/SBB_Lore',
     url: 'https://sbb-lore.vercel.app/',

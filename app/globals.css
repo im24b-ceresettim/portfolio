@@ -204,41 +204,164 @@ h2 {
 
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  padding-top: 1rem;
 }
 
 .project-card {
-  border: 1px solid black;
-  border-radius: 10px;
-  padding: 1rem;
-  background: rgba(247, 247, 247, 0.58);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 html.dark .project-card {
-  border-color: var(--surface-glass-border);
-  background: var(--surface-glass-bg);
+  background: rgba(20, 20, 22, 0.65);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+html.dark .project-card:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.project-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .project-card h3 {
-  margin-bottom: 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
 }
 
-.project-card p {
-  margin-bottom: 0.6rem;
+.project-desc {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
 }
 
-.project-card .stack {
-  color: black;
+html.dark .project-desc {
+  color: #a1a1aa;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.tech-tag {
+  padding: 0.25rem 0.85rem;
+  border-radius: 9999px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.75rem;
   font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-html.dark .project-card .stack {
-  color: white;
+html.dark .tech-tag {
+  background: rgba(255, 255, 255, 0.1);
+  color: #d1d5db;
 }
 
-.project-card a,
-.project-card a:visited,
+.project-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+html.dark .project-actions {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.project-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+}
+
+.project-btn.github-btn {
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+}
+
+.project-btn.github-btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+html.dark .project-btn.github-btn {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+html.dark .project-btn.github-btn:hover {
+  background: #ddd;
+  color: #000;
+}
+
+.project-btn.live-btn {
+  background: transparent;
+  color: #111;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.project-btn.live-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+  color: #111;
+}
+
+html.dark .project-btn.live-btn {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+html.dark .project-btn.live-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.btn-icon {
+  flex-shrink: 0;
+}
 .contact-card a,
 .contact-card a:visited {
   color: black;
@@ -246,14 +369,11 @@ html.dark .project-card .stack {
   text-decoration: none;
 }
 
-html.dark .project-card a,
-html.dark .project-card a:visited,
 html.dark .contact-card a,
 html.dark .contact-card a:visited {
   color: white;
 }
 
-.project-card a:hover,
 .contact-card a:hover {
   text-decoration: underline;
 }
