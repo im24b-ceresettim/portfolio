@@ -27,7 +27,6 @@ export default function Home() {
       <section id="projects" className="page-section">
         <div className="section-inner">
           <p className="section-tag">Projects</p>
-          <h2>Ausgewählte Arbeiten</h2>
           <div className="project-grid">
             {projects.map((project) => {
               const hasGh = project.gh && project.gh !== '#';
@@ -72,7 +71,6 @@ export default function Home() {
       <section id="about-me" className="page-section">
         <div className="section-inner">
           <p className="section-tag">about me</p>
-          <h2>Profil</h2>
           <p className="section-lead">{portfolioData.about}</p>
 
           <div className="skills-container">
@@ -95,17 +93,55 @@ export default function Home() {
 
             <div className="skills-section">
               <h3 className="skills-title">Technologien</h3>
-              <div className="skills-grid tech-grid">
-                {portfolioData.techSkills.map(skill => (
-                  <div key={skill.name} className="skill-item">
-                    <img
-                      src={`https://skillicons.dev/icons?i=${skill.icon}`}
-                      alt={`${skill.name} icon`}
-                      className="skill-icon"
-                    />
-                    <span className="skill-name">{skill.name}</span>
+              <div className="skills-columns" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '2rem' }}>
+                <div className="skills-col">
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Frontend</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {portfolioData.techSkills.frontend.map(skill => (
+                      <div key={skill.name} className="skill-item">
+                        <img
+                          src={`https://skillicons.dev/icons?i=${skill.icon}`}
+                          alt={`${skill.name} icon`}
+                          className="skill-icon"
+                        />
+                        <span className="skill-name">{skill.name}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                <div className="skills-col">
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Backend</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {portfolioData.techSkills.backend.map(skill => (
+                      <div key={skill.name} className="skill-item">
+                        <img
+                          src={`https://skillicons.dev/icons?i=${skill.icon}`}
+                          alt={`${skill.name} icon`}
+                          className="skill-icon"
+                        />
+                        <span className="skill-name">{skill.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="skills-col">
+                  <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Datenbank</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {portfolioData.techSkills.database.map(skill => (
+                      <div key={skill.name} className="skill-item">
+                        <img
+                          src={`https://skillicons.dev/icons?i=${skill.icon}`}
+                          alt={`${skill.name} icon`}
+                          className="skill-icon"
+                        />
+                        <span className="skill-name">{skill.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>

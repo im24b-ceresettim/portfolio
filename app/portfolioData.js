@@ -8,25 +8,31 @@ export const portfolioData = {
   phone: '078 247 44 53',
   email: 'mat.cerelappo@gmail.com',
   github: 'https://github.com/im24b-ceresettim',
-  profileImage: '/profile-placeholder.svg',
+  profileImage: '/myimage.jpeg',
   languages: [
     { name: 'Italienisch', level: 'C2 (Diplom: B2)', flag: 'it' },
     { name: 'Deutsch', level: 'B2', flag: 'de' },
     { name: 'Englisch', level: 'B2', flag: 'gb' },
     { name: 'Französisch', level: 'B1', flag: 'fr' },
-    { name: 'Spanisch', level: 'B1', flag: 'es' },
+    { name: 'Spanisch', level: 'A2', flag: 'es' },
   ],
-  techSkills: [
-    { name: 'Java', icon: 'java' },
-    { name: 'Spring', icon: 'spring' },
-    { name: 'MySQL', icon: 'mysql' },
-    { name: 'PostgreSQL', icon: 'postgres' },
-    { name: 'React', icon: 'react' },
-    { name: 'Next.js', icon: 'nextjs' },
-    { name: 'Node.js', icon: 'nodejs' },
-    { name: 'Tailwind CSS', icon: 'tailwind' },
-    { name: 'Docker', icon: 'docker' },
-  ],
+  techSkills: {
+    frontend: [
+      { name: 'React', icon: 'react' },
+      { name: 'Next.js', icon: 'nextjs' },
+      { name: 'Tailwind', icon: 'tailwind' },
+    ],
+    backend: [
+      { name: 'Java', icon: 'java' },
+      { name: 'Spring', icon: 'spring' },
+      { name: 'Node.js', icon: 'nodejs' },
+    ],
+    database: [
+      { name: 'MySQL', icon: 'mysql' },
+      { name: 'Postgre', icon: 'postgres' },
+      { name: 'Docker', icon: 'docker' },
+    ],
+  },
 };
 
 export const projects = [

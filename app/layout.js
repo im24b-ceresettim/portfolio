@@ -17,10 +17,17 @@ export default function RootLayout({ children }) {
   const [showSun, setShowSun] = useState(true);
   const [lightmode, setLightmode] = useState(true);
   const [isHoverDisabled, setIsHoverDisabled] = useState(false);
-  const [activeSection, setActiveSection] = useState(() => {
-    if (typeof window === "undefined") return "home";
-    return window.location.hash.replace("#", "") || "home";
-  });
+  const [activeSection, setActiveSection] = useState("home");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setActiveSection(hash);
+      }
+    }
+  }, []);
 
   const activeSectionRef = useRef("home");
   const isAutoScrollingRef = useRef(false);
