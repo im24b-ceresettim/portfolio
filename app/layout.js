@@ -54,6 +54,13 @@ export default function RootLayout({ children }) {
     }
   }, []);
 
+  const getStickyNavOffset = useCallback(() => {
+    const nav = document.querySelector("nav");
+    if (!nav) return 0;
+    const height = nav.getBoundingClientRect().height;
+    return Number.isFinite(height) ? height : 0;
+  }, []);
+
   const smoothScrollToSection = useCallback((targetId) => {
     const targetSection = document.getElementById(targetId);
     if (!targetSection) return;
@@ -64,7 +71,8 @@ export default function RootLayout({ children }) {
     updateUrlForSection(targetId);
 
     const startY = window.scrollY;
-    const targetY = targetSection.getBoundingClientRect().top + window.scrollY;
+    const navOffset = getStickyNavOffset();
+    const targetY = targetSection.getBoundingClientRect().top + window.scrollY - navOffset;
     const duration = 500;
     const startTime = performance.now();
 
@@ -84,7 +92,7 @@ export default function RootLayout({ children }) {
     };
 
     animationFrameRef.current = window.requestAnimationFrame(step);
-  }, [stopAnimation, updateUrlForSection]);
+  }, [getStickyNavOffset, stopAnimation, updateUrlForSection]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -94,10 +102,12 @@ export default function RootLayout({ children }) {
     if (initialHash) {
       const section = document.getElementById(initialHash);
       if (section) {
-        section.scrollIntoView({ behavior: "auto", block: "start" });
+        const navOffset = getStickyNavOffset();
+        const y = section.getBoundingClientRect().top + window.scrollY - navOffset;
+        window.scrollTo(0, y);
       }
     }
-  }, []);
+  }, [getStickyNavOffset]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

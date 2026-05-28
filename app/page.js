@@ -152,7 +152,6 @@ export default function Home() {
       <section id="contact" className="page-section">
         <div className="section-inner">
           <p className="section-tag">contact</p>
-          <h2>Kontaktaufnahme</h2>
           <div className="contact-card">
             <p>
               <strong>Telefon:</strong>{' '}
