@@ -8,7 +8,7 @@ export const portfolioData = {
   phone: '078 247 44 53',
   email: 'mat.cerelappo@gmail.com',
   github: 'https://github.com/im24b-ceresettim',
-  profileImage: '/myimage.jpeg',
+  profileImage: '/Myimage.jpeg',
   languages: [
     { name: 'Italienisch', level: 'C2 (Diplom: B2)', flag: 'it' },
     { name: 'Deutsch', level: 'B2', flag: 'de' },
@@ -18,11 +18,13 @@ export const portfolioData = {
   ],
   techSkills: {
     frontend: [
-      { name: 'React', icon: 'react' },
+      { name: 'JavaScript', icon: 'js' },
       { name: 'Next.js', icon: 'nextjs' },
+      { name: 'React', icon: 'react' },
       { name: 'Tailwind', icon: 'tailwind' },
     ],
     backend: [
+      { name: 'Python', icon: 'python' },
       { name: 'Java', icon: 'java' },
       { name: 'Spring', icon: 'spring' },
       { name: 'Node.js', icon: 'nodejs' },
@@ -31,6 +33,7 @@ export const portfolioData = {
       { name: 'MySQL', icon: 'mysql' },
       { name: 'Postgre', icon: 'postgres' },
       { name: 'Docker', icon: 'docker' },
+      { name: 'AWS', icon: 'aws' },
     ],
   },
 };

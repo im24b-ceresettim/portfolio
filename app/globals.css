@@ -45,7 +45,7 @@ html.dark body {
 nav {
   display: flex;
   position: sticky;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255, 255, 255);
   top: 0;
   align-items: center;
   justify-content: space-between;
