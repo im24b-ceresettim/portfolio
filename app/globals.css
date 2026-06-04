@@ -371,6 +371,7 @@ html.dark .tech-tag {
   html {
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    overscroll-behavior-y: none;
   }
 
   .nav-link {

@@ -31,6 +31,7 @@ export default function RootLayout({ children }) {
 
   const activeSectionRef = useRef("home");
   const isAutoScrollingRef = useRef(false);
+  const isClampingRef = useRef(false);
   const animationFrameRef = useRef(null);
 
   useEffect(() => {
@@ -117,6 +118,8 @@ export default function RootLayout({ children }) {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isClampingRef.current) return;
+
         const visibleEntry = entries.find((entry) => entry.isIntersecting);
         if (!visibleEntry?.target?.id) return;
 
@@ -143,6 +146,81 @@ export default function RootLayout({ children }) {
 
     const COMPACT_MAX_WIDTH = 1030;
     const SCROLL_EDGE_TOLERANCE = 8;
+
+    const getSectionScrollBounds = (section, navOffset) => {
+      const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+      const sectionBottom = sectionTop + section.offsetHeight;
+      const minY = sectionTop - navOffset;
+      const maxY = sectionBottom - window.innerHeight;
+      return { minY, maxY: Math.max(minY, maxY) };
+    };
+
+    const isSectionTallerThanViewport = (section, navOffset) =>
+      section.scrollHeight > window.innerHeight - navOffset + 2;
+
+    const syncActiveSection = (sectionId) => {
+      if (activeSectionRef.current === sectionId) return;
+      activeSectionRef.current = sectionId;
+      setActiveSection(sectionId);
+      updateUrlForSection(sectionId);
+    };
+
+    const applyClamp = (targetY, sectionId) => {
+      isClampingRef.current = true;
+      window.scrollTo(0, targetY);
+      syncActiveSection(sectionId);
+      requestAnimationFrame(() => {
+        isClampingRef.current = false;
+      });
+    };
+
+    const clampScrollBounds = () => {
+      if (isAutoScrollingRef.current || isClampingRef.current) return;
+      if (window.innerWidth > COMPACT_MAX_WIDTH) return;
+
+      const navOffset = getStickyNavOffset();
+      const aboutMe = document.getElementById("about-me");
+
+      if (aboutMe && isSectionTallerThanViewport(aboutMe, navOffset)) {
+        const { minY, maxY } = getSectionScrollBounds(aboutMe, navOffset);
+        const contact = document.getElementById("contact");
+        const contactMinY = contact
+          ? contact.getBoundingClientRect().top + window.scrollY - navOffset
+          : Infinity;
+
+        if (
+          window.scrollY > maxY &&
+          window.scrollY < contactMinY - SCROLL_EDGE_TOLERANCE
+        ) {
+          applyClamp(maxY, "about-me");
+          return;
+        }
+
+        const projects = document.getElementById("projects");
+        const projectsMaxY = projects
+          ? getSectionScrollBounds(projects, navOffset).maxY
+          : -Infinity;
+
+        if (
+          window.scrollY < minY &&
+          window.scrollY > projectsMaxY - SCROLL_EDGE_TOLERANCE
+        ) {
+          applyClamp(minY, "about-me");
+          return;
+        }
+      }
+
+      const section = document.getElementById(activeSectionRef.current);
+      if (!section || !isSectionTallerThanViewport(section, navOffset)) return;
+
+      const { minY, maxY } = getSectionScrollBounds(section, navOffset);
+
+      if (window.scrollY < minY) {
+        applyClamp(minY, section.id);
+      } else if (window.scrollY > maxY) {
+        applyClamp(maxY, section.id);
+      }
+    };
 
     const moveOneSection = (direction) => {
       const currentIndex = navItems.findIndex((item) => item.id === activeSectionRef.current);
@@ -208,13 +286,41 @@ export default function RootLayout({ children }) {
       snapToSection();
     };
 
+    let clampRaf = null;
+
+    const scheduleClamp = () => {
+      if (clampRaf !== null) {
+        window.cancelAnimationFrame(clampRaf);
+      }
+
+      clampRaf = window.requestAnimationFrame(() => {
+        clampRaf = null;
+        clampScrollBounds();
+      });
+    };
+
+    const handleScroll = () => {
+      scheduleClamp();
+    };
+
+    const handleScrollEnd = () => {
+      clampScrollBounds();
+    };
+
     window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scrollend", handleScrollEnd, { passive: true });
 
     return () => {
       window.removeEventListener("wheel", handleWheel, { passive: false });
+      window.removeEventListener("scroll", handleScroll, { passive: true });
+      window.removeEventListener("scrollend", handleScrollEnd, { passive: true });
+      if (clampRaf !== null) {
+        window.cancelAnimationFrame(clampRaf);
+      }
       stopAnimation();
     };
-  }, [getStickyNavOffset, smoothScrollToSection, stopAnimation]);
+  }, [getStickyNavOffset, smoothScrollToSection, stopAnimation, updateUrlForSection]);
 
   const handleNavClick = (event, item) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {
