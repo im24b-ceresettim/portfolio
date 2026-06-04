@@ -33,6 +33,10 @@ export default function RootLayout({ children }) {
   const isAutoScrollingRef = useRef(false);
   const isClampingRef = useRef(false);
   const animationFrameRef = useRef(null);
+  const skipSettleUntilRef = useRef(0);
+  const hasSnappedThisGestureRef = useRef(false);
+  const isTouchActiveRef = useRef(false);
+  const pendingTouchSettleRef = useRef(false);
 
   useEffect(() => {
     activeSectionRef.current = activeSection;
@@ -62,41 +66,61 @@ export default function RootLayout({ children }) {
     return Number.isFinite(height) ? height : 0;
   }, []);
 
-  const smoothScrollToSection = useCallback((targetId, align = "top") => {
-    const targetSection = document.getElementById(targetId);
-    if (!targetSection) return;
+  const scrollToSection = useCallback(
+    (targetId, align = "top", behavior = "smooth") => {
+      const targetSection = document.getElementById(targetId);
+      if (!targetSection) return;
 
-    stopAnimation();
-    isAutoScrollingRef.current = true;
-    setActiveSection(targetId);
-    updateUrlForSection(targetId);
+      stopAnimation();
 
-    const startY = window.scrollY;
-    const navOffset = getStickyNavOffset();
-    const topY = targetSection.getBoundingClientRect().top + window.scrollY - navOffset;
-    const bottomY =
-      targetSection.offsetTop + targetSection.offsetHeight - window.innerHeight;
-    const targetY = align === "bottom" ? Math.max(topY, bottomY) : topY;
-    const duration = 500;
-    const startTime = performance.now();
+      const navOffset = getStickyNavOffset();
+      const topY =
+        targetSection.getBoundingClientRect().top + window.scrollY - navOffset;
+      const bottomY =
+        targetSection.offsetTop + targetSection.offsetHeight - window.innerHeight;
+      const targetY = align === "bottom" ? Math.max(topY, bottomY) : topY;
 
-    const step = (now) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = 1 - Math.pow(1 - progress, 3);
-      window.scrollTo(0, startY + (targetY - startY) * easedProgress);
+      activeSectionRef.current = targetId;
+      setActiveSection(targetId);
+      updateUrlForSection(targetId);
 
-      if (progress < 1) {
-        animationFrameRef.current = window.requestAnimationFrame(step);
+      if (behavior === "instant") {
+        window.scrollTo({ top: targetY, behavior: "instant" });
         return;
       }
 
-      animationFrameRef.current = null;
-      isAutoScrollingRef.current = false;
-    };
+      isAutoScrollingRef.current = true;
+      const startY = window.scrollY;
+      const duration = 350;
+      const startTime = performance.now();
 
-    animationFrameRef.current = window.requestAnimationFrame(step);
-  }, [getStickyNavOffset, stopAnimation, updateUrlForSection]);
+      const step = (now) => {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easedProgress = 1 - Math.pow(1 - progress, 3);
+        window.scrollTo(0, startY + (targetY - startY) * easedProgress);
+
+        if (progress < 1) {
+          animationFrameRef.current = window.requestAnimationFrame(step);
+          return;
+        }
+
+        animationFrameRef.current = null;
+        isAutoScrollingRef.current = false;
+        hasSnappedThisGestureRef.current = false;
+      };
+
+      animationFrameRef.current = window.requestAnimationFrame(step);
+    },
+    [getStickyNavOffset, stopAnimation, updateUrlForSection]
+  );
+
+  const smoothScrollToSection = useCallback(
+    (targetId, align = "top") => {
+      scrollToSection(targetId, align, "smooth");
+    },
+    [scrollToSection]
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -146,6 +170,22 @@ export default function RootLayout({ children }) {
 
     const COMPACT_MAX_WIDTH = 1030;
     const SCROLL_EDGE_TOLERANCE = 8;
+    const WHEEL_ACCUMULATE_MS = 120;
+    const WHEEL_SNAP_THRESHOLD = 50;
+    const SETTLE_DEBOUNCE_MS = 150;
+    const TOUCH_SWIPE_THRESHOLD = 60;
+    const SKIP_SETTLE_AFTER_SNAP_MS = 900;
+    const SKIP_SETTLE_AFTER_TOUCH_MS = 300;
+    const GESTURE_IDLE_MS = 400;
+    const WHEEL_IDLE_SNAP_THRESHOLD = 25;
+
+    const stopScrollMomentum = () => {
+      window.scrollTo({ top: window.scrollY, behavior: "instant" });
+    };
+
+    const recordSnap = () => {
+      skipSettleUntilRef.current = Date.now() + SKIP_SETTLE_AFTER_SNAP_MS;
+    };
 
     const getSectionScrollBounds = (section, navOffset) => {
       const sectionTop = section.getBoundingClientRect().top + window.scrollY;
@@ -157,6 +197,60 @@ export default function RootLayout({ children }) {
 
     const isSectionTallerThanViewport = (section, navOffset) =>
       section.scrollHeight > window.innerHeight - navOffset + 2;
+
+    const getActiveSection = () => document.getElementById(activeSectionRef.current);
+
+    const isAtSectionEdge = (section, direction, navOffset) => {
+      if (!section) return true;
+
+      const viewportHeight = window.innerHeight;
+      const isScrollable = section.scrollHeight > viewportHeight - navOffset + 2;
+      if (!isScrollable) return true;
+
+      const sectionTopScroll = section.getBoundingClientRect().top + window.scrollY;
+      const sectionBottomScroll = sectionTopScroll + section.offsetHeight;
+      const atTop =
+        window.scrollY <= sectionTopScroll - navOffset + SCROLL_EDGE_TOLERANCE;
+      const atBottom =
+        window.scrollY + viewportHeight >=
+        sectionBottomScroll - SCROLL_EDGE_TOLERANCE;
+
+      if (direction === "down") return atBottom;
+      if (direction === "up") return atTop;
+      return atTop || atBottom;
+    };
+
+    const getNearestSectionId = (scrollY, navOffset) => {
+      let nearestId = navItems[0].id;
+      let minDistance = Infinity;
+
+      navItems.forEach((item) => {
+        const section = document.getElementById(item.id);
+        if (!section) return;
+
+        const { minY } = getSectionScrollBounds(section, navOffset);
+        const distance = Math.abs(scrollY - minY);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestId = item.id;
+        }
+      });
+
+      return nearestId;
+    };
+
+    const isInsideTallSectionBounds = (scrollY, navOffset) => {
+      if (window.innerWidth > COMPACT_MAX_WIDTH) return false;
+
+      const section = getActiveSection();
+      if (!section || !isSectionTallerThanViewport(section, navOffset)) return false;
+
+      const { minY, maxY } = getSectionScrollBounds(section, navOffset);
+      return (
+        scrollY >= minY - SCROLL_EDGE_TOLERANCE &&
+        scrollY <= maxY + SCROLL_EDGE_TOLERANCE
+      );
+    };
 
     const syncActiveSection = (sectionId) => {
       if (activeSectionRef.current === sectionId) return;
@@ -210,7 +304,7 @@ export default function RootLayout({ children }) {
         }
       }
 
-      const section = document.getElementById(activeSectionRef.current);
+      const section = getActiveSection();
       if (!section || !isSectionTallerThanViewport(section, navOffset)) return;
 
       const { minY, maxY } = getSectionScrollBounds(section, navOffset);
@@ -222,16 +316,21 @@ export default function RootLayout({ children }) {
       }
     };
 
-    const moveOneSection = (direction) => {
-      const currentIndex = navItems.findIndex((item) => item.id === activeSectionRef.current);
-      if (currentIndex === -1) return;
+    const moveOneSection = (direction, behavior = "smooth") => {
+      if (isAutoScrollingRef.current) return false;
 
-      const nextIndex = direction === "down"
-        ? Math.min(currentIndex + 1, navItems.length - 1)
-        : Math.max(currentIndex - 1, 0);
+      const currentIndex = navItems.findIndex(
+        (item) => item.id === activeSectionRef.current
+      );
+      if (currentIndex === -1) return false;
+
+      const nextIndex =
+        direction === "down"
+          ? Math.min(currentIndex + 1, navItems.length - 1)
+          : Math.max(currentIndex - 1, 0);
 
       const nextId = navItems[nextIndex].id;
-      if (nextId === activeSectionRef.current) return;
+      if (nextId === activeSectionRef.current) return false;
 
       const align =
         nextId === "about-me" &&
@@ -240,55 +339,246 @@ export default function RootLayout({ children }) {
           ? "bottom"
           : "top";
 
-      smoothScrollToSection(nextId, align);
+      scrollToSection(nextId, align, behavior);
+      return true;
+    };
+
+    let wheelAccumulator = 0;
+    let wheelAccumulateTimer = null;
+    let gestureIdleTimer = null;
+
+    const resetWheelAccumulator = () => {
+      wheelAccumulator = 0;
+      if (wheelAccumulateTimer !== null) {
+        window.clearTimeout(wheelAccumulateTimer);
+        wheelAccumulateTimer = null;
+      }
+    };
+
+    const markWheelGestureActivity = () => {
+      if (gestureIdleTimer !== null) {
+        window.clearTimeout(gestureIdleTimer);
+      }
+
+      gestureIdleTimer = window.setTimeout(() => {
+        gestureIdleTimer = null;
+
+        if (
+          !hasSnappedThisGestureRef.current &&
+          Math.abs(wheelAccumulator) >= WHEEL_IDLE_SNAP_THRESHOLD
+        ) {
+          const direction = wheelAccumulator > 0 ? "down" : "up";
+          performSnap(direction, null);
+        }
+
+        resetWheelAccumulator();
+
+        if (!isAutoScrollingRef.current) {
+          hasSnappedThisGestureRef.current = false;
+        }
+      }, GESTURE_IDLE_MS);
+    };
+
+    const performSnap = (direction, event) => {
+      if (hasSnappedThisGestureRef.current) {
+        resetWheelAccumulator();
+        if (event) event.preventDefault();
+        return;
+      }
+
+      stopScrollMomentum();
+
+      if (!moveOneSection(direction)) {
+        resetWheelAccumulator();
+        if (event) event.preventDefault();
+        return;
+      }
+
+      hasSnappedThisGestureRef.current = true;
+      resetWheelAccumulator();
+      recordSnap();
+      if (event) event.preventDefault();
+    };
+
+    const trySnapSection = (direction, event = null) => {
+      performSnap(direction, event);
+    };
+
+    const getSettleAlign = (nearestId, scrollY, navOffset) => {
+      if (nearestId !== "about-me" || window.innerWidth > COMPACT_MAX_WIDTH) {
+        return "top";
+      }
+
+      const aboutMe = document.getElementById("about-me");
+      if (!aboutMe) return "top";
+
+      const { minY, maxY } = getSectionScrollBounds(aboutMe, navOffset);
+      const distToTop = Math.abs(scrollY - minY);
+      const distToBottom = Math.abs(scrollY - maxY);
+
+      if (scrollY > maxY - SCROLL_EDGE_TOLERANCE && distToBottom <= distToTop) {
+        return "bottom";
+      }
+
+      return "top";
+    };
+
+    const settleToSection = () => {
+      if (isAutoScrollingRef.current || isClampingRef.current) return;
+      if (Date.now() < skipSettleUntilRef.current) return;
+
+      const navOffset = getStickyNavOffset();
+      const scrollY = window.scrollY;
+
+      if (isInsideTallSectionBounds(scrollY, navOffset)) return;
+
+      const nearestId = getNearestSectionId(scrollY, navOffset);
+      const section = document.getElementById(nearestId);
+      if (!section) return;
+
+      const { minY } = getSectionScrollBounds(section, navOffset);
+      if (
+        nearestId === activeSectionRef.current &&
+        Math.abs(scrollY - minY) <= SCROLL_EDGE_TOLERANCE
+      ) {
+        return;
+      }
+
+      stopScrollMomentum();
+      const align = getSettleAlign(nearestId, scrollY, navOffset);
+      scrollToSection(nearestId, align, "instant");
+    };
+
+    const snapFromWheelAccumulator = (event) => {
+      if (Math.abs(wheelAccumulator) < WHEEL_SNAP_THRESHOLD) {
+        wheelAccumulator = 0;
+        return;
+      }
+
+      const direction = wheelAccumulator > 0 ? "down" : "up";
+      performSnap(direction, event);
+    };
+
+    const scheduleWheelFlush = (event) => {
+      if (wheelAccumulateTimer !== null) {
+        window.clearTimeout(wheelAccumulateTimer);
+      }
+
+      wheelAccumulateTimer = window.setTimeout(() => {
+        wheelAccumulateTimer = null;
+        snapFromWheelAccumulator(event);
+      }, WHEEL_ACCUMULATE_MS);
     };
 
     const handleWheel = (event) => {
-      if (Math.abs(event.deltaY) < 1) return;
-      if (isAutoScrollingRef.current) return;
+      if (isAutoScrollingRef.current) {
+        event.preventDefault();
+        return;
+      }
 
       const direction = event.deltaY > 0 ? "down" : "up";
-
-      const snapToSection = () => {
-        event.preventDefault();
-        moveOneSection(direction);
-      };
+      const navOffset = getStickyNavOffset();
 
       if (window.innerWidth > COMPACT_MAX_WIDTH) {
-        snapToSection();
+        event.preventDefault();
+        markWheelGestureActivity();
+
+        if (hasSnappedThisGestureRef.current) {
+          return;
+        }
+
+        if (Math.abs(event.deltaY) < 0.01) return;
+
+        wheelAccumulator += event.deltaY;
+
+        if (Math.abs(wheelAccumulator) >= WHEEL_SNAP_THRESHOLD) {
+          if (wheelAccumulateTimer !== null) {
+            window.clearTimeout(wheelAccumulateTimer);
+            wheelAccumulateTimer = null;
+          }
+          snapFromWheelAccumulator(event);
+          return;
+        }
+
+        scheduleWheelFlush(event);
         return;
       }
 
-      const section = document.getElementById(activeSectionRef.current);
-      if (!section) {
-        snapToSection();
+      const section = getActiveSection();
+
+      if (!section || !isSectionTallerThanViewport(section, navOffset)) {
+        event.preventDefault();
+        markWheelGestureActivity();
+
+        if (hasSnappedThisGestureRef.current) {
+          resetWheelAccumulator();
+          return;
+        }
+
+        wheelAccumulator += event.deltaY;
+
+        if (Math.abs(wheelAccumulator) >= WHEEL_SNAP_THRESHOLD) {
+          if (wheelAccumulateTimer !== null) {
+            window.clearTimeout(wheelAccumulateTimer);
+            wheelAccumulateTimer = null;
+          }
+          snapFromWheelAccumulator(event);
+          return;
+        }
+
+        scheduleWheelFlush(event);
         return;
       }
 
-      const navOffset = getStickyNavOffset();
-      const viewportHeight = window.innerHeight;
-      const isScrollable = section.scrollHeight > viewportHeight - navOffset + 2;
-
-      if (!isScrollable) {
-        snapToSection();
+      if (!isAtSectionEdge(section, direction, navOffset)) {
+        resetWheelAccumulator();
         return;
       }
 
-      const sectionTopScroll = section.getBoundingClientRect().top + window.scrollY;
-      const sectionBottomScroll = sectionTopScroll + section.offsetHeight;
-      const atTop = window.scrollY <= sectionTopScroll - navOffset + SCROLL_EDGE_TOLERANCE;
-      const atBottom =
-        window.scrollY + viewportHeight >= sectionBottomScroll - SCROLL_EDGE_TOLERANCE;
+      event.preventDefault();
+      markWheelGestureActivity();
 
-      if (direction === "down" && !atBottom) return;
-      if (direction === "up" && !atTop) return;
+      if (hasSnappedThisGestureRef.current) {
+        resetWheelAccumulator();
+        return;
+      }
 
-      snapToSection();
+      wheelAccumulator += event.deltaY;
+
+      if (Math.abs(wheelAccumulator) >= WHEEL_SNAP_THRESHOLD) {
+        if (wheelAccumulateTimer !== null) {
+          window.clearTimeout(wheelAccumulateTimer);
+          wheelAccumulateTimer = null;
+        }
+        snapFromWheelAccumulator(event);
+        return;
+      }
+
+      scheduleWheelFlush(event);
     };
 
     let clampRaf = null;
+    let settleTimer = null;
+    let touchStartY = null;
+
+    const runPostScrollCorrection = () => {
+      if (isTouchActiveRef.current) return;
+
+      clampScrollBounds();
+
+      if (pendingTouchSettleRef.current) {
+        pendingTouchSettleRef.current = false;
+        settleToSection();
+        skipSettleUntilRef.current = Date.now() + SKIP_SETTLE_AFTER_TOUCH_MS;
+        return;
+      }
+
+      settleToSection();
+    };
 
     const scheduleClamp = () => {
+      if (isTouchActiveRef.current) return;
+
       if (clampRaf !== null) {
         window.cancelAnimationFrame(clampRaf);
       }
@@ -299,28 +589,115 @@ export default function RootLayout({ children }) {
       });
     };
 
+    const scheduleSettle = () => {
+      if (isTouchActiveRef.current) return;
+
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+      }
+
+      settleTimer = window.setTimeout(() => {
+        settleTimer = null;
+        runPostScrollCorrection();
+      }, SETTLE_DEBOUNCE_MS);
+    };
+
     const handleScroll = () => {
       scheduleClamp();
+      scheduleSettle();
     };
 
     const handleScrollEnd = () => {
-      clampScrollBounds();
+      if (isTouchActiveRef.current) return;
+
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+        settleTimer = null;
+      }
+      runPostScrollCorrection();
+    };
+
+    const finishTouchGesture = (endY) => {
+      isTouchActiveRef.current = false;
+
+      if (touchStartY === null) {
+        pendingTouchSettleRef.current = true;
+        return;
+      }
+
+      const deltaY = touchStartY - endY;
+      touchStartY = null;
+
+      if (isAutoScrollingRef.current) return;
+
+      stopScrollMomentum();
+
+      const direction = deltaY > 0 ? "down" : "up";
+      const navOffset = getStickyNavOffset();
+      const section = getActiveSection();
+      const absDelta = Math.abs(deltaY);
+
+      if (absDelta >= TOUCH_SWIPE_THRESHOLD) {
+        const atEdge =
+          !section ||
+          !isSectionTallerThanViewport(section, navOffset) ||
+          isAtSectionEdge(section, direction, navOffset);
+
+        if (atEdge && moveOneSection(direction, "instant")) {
+          skipSettleUntilRef.current = Date.now() + SKIP_SETTLE_AFTER_TOUCH_MS;
+          return;
+        }
+      }
+
+      pendingTouchSettleRef.current = true;
+    };
+
+    const handleTouchStart = (event) => {
+      if (event.touches.length !== 1) return;
+      isTouchActiveRef.current = true;
+      pendingTouchSettleRef.current = false;
+      touchStartY = event.touches[0].clientY;
+    };
+
+    const handleTouchEnd = (event) => {
+      if (event.changedTouches.length === 0) {
+        finishTouchGesture(touchStartY ?? 0);
+        return;
+      }
+      finishTouchGesture(event.changedTouches[0].clientY);
+    };
+
+    const handleTouchCancel = () => {
+      finishTouchGesture(touchStartY ?? 0);
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("scrollend", handleScrollEnd, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", handleTouchCancel, { passive: true });
 
     return () => {
       window.removeEventListener("wheel", handleWheel, { passive: false });
       window.removeEventListener("scroll", handleScroll, { passive: true });
       window.removeEventListener("scrollend", handleScrollEnd, { passive: true });
+      window.removeEventListener("touchstart", handleTouchStart, { passive: true });
+      window.removeEventListener("touchend", handleTouchEnd, { passive: true });
+      window.removeEventListener("touchcancel", handleTouchCancel, { passive: true });
       if (clampRaf !== null) {
         window.cancelAnimationFrame(clampRaf);
       }
+      resetWheelAccumulator();
+      if (gestureIdleTimer !== null) {
+        window.clearTimeout(gestureIdleTimer);
+      }
+      if (settleTimer !== null) {
+        window.clearTimeout(settleTimer);
+      }
       stopAnimation();
     };
-  }, [getStickyNavOffset, smoothScrollToSection, stopAnimation, updateUrlForSection]);
+  }, [getStickyNavOffset, scrollToSection, stopAnimation, updateUrlForSection]);
 
   const handleNavClick = (event, item) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {

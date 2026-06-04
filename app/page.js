@@ -12,11 +12,11 @@ export default function Home() {
             <h2>{portfolioData.role}</h2>
             <p className="section-lead">{portfolioData.headline}</p>
           </div>
-          <div className="profile-placeholder" aria-label="Platzhalter für Profilbild">
+          <div className="profile-placeholder" aria-label="Profilbild">
             <Image
               className="profile-placeholder-image"
               src={portfolioData.profileImage}
-              alt="Profilbild Platzhalter"
+              alt="Profilbild"
               width={220}
               height={220}
             />

@@ -15,7 +15,7 @@ export const portfolioData = {
     { name: 'Englisch', level: 'B2', flag: 'gb' },
     { name: 'Französisch', level: 'B1', flag: 'fr' },
     { name: 'Spanisch', level: 'A2', flag: 'es' },
-  ],
+  ], 
   techSkills: {
     frontend: [
       { name: 'JavaScript', icon: 'js' },

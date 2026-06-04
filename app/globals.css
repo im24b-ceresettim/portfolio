@@ -10,6 +10,10 @@ html.dark {
   --section-overlay-light: rgba(255, 255, 255, 0.38);
 }
 
+html {
+  overscroll-behavior-y: none;
+}
+
 .universe-canvas {
   position: fixed;
   inset: 0;
@@ -141,14 +145,9 @@ html.dark .page-section {
 .profile-placeholder {
   width: 220px;
   height: 220px;
-  border: 2px dashed black;
   border-radius: 14px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: black;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .profile-placeholder-image {
@@ -156,12 +155,6 @@ html.dark .page-section {
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-html.dark .profile-placeholder {
-  border-color: white;
-  background: black;
-  color: white;
 }
 
 @media (max-width: 1030px) {
@@ -371,7 +364,6 @@ html.dark .tech-tag {
   html {
     overflow-y: scroll;
     scrollbar-gutter: stable;
-    overscroll-behavior-y: none;
   }
 
   .nav-link {
