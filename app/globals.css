@@ -113,7 +113,7 @@ html.dark .nav-link[aria-current="page"] {
   min-height: calc(100vh - 64px);
   display: flex;
   align-items: center;
-  padding: 2.5rem 1.25rem;
+  padding: 2.5rem 1rem;
   background: var(--section-overlay-light);
 }
 
@@ -495,19 +495,35 @@ html.dark .project-btn.live-btn:hover {
 }
 
 @media (min-width: 1031px) {
+  .section-inner {
+    max-width: 1080px;
+  }
+
   .skills-container {
     grid-template-columns: repeat(2, 1fr);
-    gap: 4rem;
+    gap: 3rem;
   }
 
   .skills-columns {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
   }
 
   .skills-col {
-    width: auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .skills-columns .skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .skills-columns .skill-item {
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -535,8 +551,10 @@ html.dark .skills-title {
   gap: 1.5rem 2rem;
 }
 
-.skills-columns .skill-item {
-  width: auto;
+@media (max-width: 1030px) {
+  .skills-columns .skill-item {
+    width: auto;
+  }
 }
 
 .skills-grid.tech-grid {
@@ -612,20 +630,6 @@ html.dark .skill-item:hover {
 
 .skill-name {
   font-weight: 600;
-}
-
-/* PC only (≥1031px): smaller skill names to fit chips */
-@media (min-width: 1031px) {
-  .skills-container .skill-name {
-    font-size: 0.85rem;
-  }
-}
-
-/* Phone + middle: keep default skill name size */
-@media (max-width: 1030px) {
-  .skills-container .skill-name {
-    font-size: 1rem;
-  }
 }
 
 .skill-level {
