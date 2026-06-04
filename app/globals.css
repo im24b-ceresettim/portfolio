@@ -361,13 +361,18 @@ html.dark .tech-tag {
     margin-top: 2rem;
   }
 
-  .skill-item {
+  .skills-grid .skill-item {
     width: 100%;
     padding: 0.55rem 0.9rem;
   }
 }
 
 @media (max-width: 1030px) {
+  html {
+    overflow-y: scroll;
+    scrollbar-gutter: stable;
+  }
+
   .nav-link {
     padding: 16px 14px;
   }
@@ -378,6 +383,20 @@ html.dark .tech-tag {
 
   .project-grid {
     gap: 1.5rem;
+  }
+
+  .skills-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .skills-columns {
+    gap: 3rem;
+  }
+
+  #about-me.page-section {
+    align-items: flex-start;
+    min-height: calc(100vh - 64px);
   }
 }
 
@@ -465,10 +484,30 @@ html.dark .project-btn.live-btn:hover {
   gap: 3rem;
 }
 
-@media (min-width: 768px) {
+.skills-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.skills-col {
+  width: 100%;
+}
+
+@media (min-width: 1031px) {
   .skills-container {
     grid-template-columns: repeat(2, 1fr);
     gap: 4rem;
+  }
+
+  .skills-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 2rem;
+  }
+
+  .skills-col {
+    width: auto;
   }
 }
 
@@ -488,6 +527,16 @@ html.dark .skills-title {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem 2rem;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+}
+
+.skills-columns .skill-item {
+  width: auto;
 }
 
 .skills-grid.tech-grid {
@@ -563,6 +612,20 @@ html.dark .skill-item:hover {
 
 .skill-name {
   font-weight: 600;
+}
+
+/* PC only (≥1031px): smaller skill names to fit chips */
+@media (min-width: 1031px) {
+  .skills-container .skill-name {
+    font-size: 0.85rem;
+  }
+}
+
+/* Phone + middle: keep default skill name size */
+@media (max-width: 1030px) {
+  .skills-container .skill-name {
+    font-size: 1rem;
+  }
 }
 
 .skill-level {

@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
     return Number.isFinite(height) ? height : 0;
   }, []);
 
-  const smoothScrollToSection = useCallback((targetId) => {
+  const smoothScrollToSection = useCallback((targetId, align = "top") => {
     const targetSection = document.getElementById(targetId);
     if (!targetSection) return;
 
@@ -72,7 +72,10 @@ export default function RootLayout({ children }) {
 
     const startY = window.scrollY;
     const navOffset = getStickyNavOffset();
-    const targetY = targetSection.getBoundingClientRect().top + window.scrollY - navOffset;
+    const topY = targetSection.getBoundingClientRect().top + window.scrollY - navOffset;
+    const bottomY =
+      targetSection.offsetTop + targetSection.offsetHeight - window.innerHeight;
+    const targetY = align === "bottom" ? Math.max(topY, bottomY) : topY;
     const duration = 500;
     const startTime = performance.now();
 
@@ -138,6 +141,9 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    const COMPACT_MAX_WIDTH = 1030;
+    const SCROLL_EDGE_TOLERANCE = 8;
+
     const moveOneSection = (direction) => {
       const currentIndex = navItems.findIndex((item) => item.id === activeSectionRef.current);
       if (currentIndex === -1) return;
@@ -149,17 +155,57 @@ export default function RootLayout({ children }) {
       const nextId = navItems[nextIndex].id;
       if (nextId === activeSectionRef.current) return;
 
-      smoothScrollToSection(nextId);
+      const align =
+        nextId === "about-me" &&
+        direction === "up" &&
+        window.innerWidth <= COMPACT_MAX_WIDTH
+          ? "bottom"
+          : "top";
+
+      smoothScrollToSection(nextId, align);
     };
 
     const handleWheel = (event) => {
       if (Math.abs(event.deltaY) < 1) return;
-
-      event.preventDefault();
-
       if (isAutoScrollingRef.current) return;
 
-      moveOneSection(event.deltaY > 0 ? "down" : "up");
+      const direction = event.deltaY > 0 ? "down" : "up";
+
+      const snapToSection = () => {
+        event.preventDefault();
+        moveOneSection(direction);
+      };
+
+      if (window.innerWidth > COMPACT_MAX_WIDTH) {
+        snapToSection();
+        return;
+      }
+
+      const section = document.getElementById(activeSectionRef.current);
+      if (!section) {
+        snapToSection();
+        return;
+      }
+
+      const navOffset = getStickyNavOffset();
+      const viewportHeight = window.innerHeight;
+      const isScrollable = section.scrollHeight > viewportHeight - navOffset + 2;
+
+      if (!isScrollable) {
+        snapToSection();
+        return;
+      }
+
+      const sectionTopScroll = section.getBoundingClientRect().top + window.scrollY;
+      const sectionBottomScroll = sectionTopScroll + section.offsetHeight;
+      const atTop = window.scrollY <= sectionTopScroll - navOffset + SCROLL_EDGE_TOLERANCE;
+      const atBottom =
+        window.scrollY + viewportHeight >= sectionBottomScroll - SCROLL_EDGE_TOLERANCE;
+
+      if (direction === "down" && !atBottom) return;
+      if (direction === "up" && !atTop) return;
+
+      snapToSection();
     };
 
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -168,7 +214,7 @@ export default function RootLayout({ children }) {
       window.removeEventListener("wheel", handleWheel, { passive: false });
       stopAnimation();
     };
-  }, [smoothScrollToSection, stopAnimation]);
+  }, [getStickyNavOffset, smoothScrollToSection, stopAnimation]);
 
   const handleNavClick = (event, item) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {

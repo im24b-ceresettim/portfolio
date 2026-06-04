@@ -93,11 +93,11 @@ export default function Home() {
 
             <div className="skills-section">
               <h3 className="skills-title">Technologien</h3>
-              <div className="skills-columns" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '2rem' }}>
+              <div className="skills-columns">
 
                 <div className="skills-col">
                   <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Frontend</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skills-list">
                     {portfolioData.techSkills.frontend.map(skill => (
                       <div key={skill.name} className="skill-item">
                         <img
@@ -113,7 +113,7 @@ export default function Home() {
 
                 <div className="skills-col">
                   <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Backend</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skills-list">
                     {portfolioData.techSkills.backend.map(skill => (
                       <div key={skill.name} className="skill-item">
                         <img
@@ -129,7 +129,7 @@ export default function Home() {
 
                 <div className="skills-col">
                   <h4 style={{ fontWeight: 'bold', marginBottom: '1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Datenbank</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="skills-list">
                     {portfolioData.techSkills.database.map(skill => (
                       <div key={skill.name} className="skill-item">
                         <img
