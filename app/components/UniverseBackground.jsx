@@ -7,13 +7,16 @@ const SATURN_R = 1.8;
 const RING_INNER_R = 2.0;
 const RING_OUTER_R = 4.5;
 const STAR_COUNT = 4000;
+const SHOOTING_STAR_SPAWN_MIN_S = 8;
+const SHOOTING_STAR_SPAWN_MAX_S = 15;
+const SHOOTING_STAR_DARK_THRESHOLD = 0.85;
 
 const THEMES = {
   dark: {
     bg: new THREE.Color(0x000000),
     ambientIntensity: 0.35,
     sunIntensity: 1.3,
-    starsOpacity: 0.9,
+    starsOpacity: 1.0,
     exposure: 1.0,
   },
   light: {
@@ -185,13 +188,125 @@ function createStarField() {
 
   const mat = new THREE.PointsMaterial({
     color: 0xffffff,
-    size: 0.18,
+    size: 0.24,
     sizeAttenuation: true,
     transparent: true,
     depthWrite: false,
+    blending: THREE.AdditiveBlending,
   });
 
   return new THREE.Points(geom, mat);
+}
+
+function spawnShootingStar(scene, camera) {
+  const length = 20 + Math.random() * 15;
+  const speed = 80 + Math.random() * 40;
+
+  const right = new THREE.Vector3();
+  const up = new THREE.Vector3();
+  camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
+  right.y *= 0.35;
+  up.y *= 0.2;
+
+  const direction = new THREE.Vector3()
+    .addScaledVector(right, Math.random() - 0.5)
+    .addScaledVector(up, (Math.random() - 0.5) * 0.35)
+    .normalize();
+
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  const radius = 70 + Math.random() * 30;
+  const head = new THREE.Vector3(
+    radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.sin(phi) * Math.sin(theta),
+    radius * Math.cos(phi),
+  );
+  const tail = head.clone().addScaledVector(direction, -length);
+
+  const positions = new Float32Array([
+    tail.x,
+    tail.y,
+    tail.z,
+    head.x,
+    head.y,
+    head.z,
+  ]);
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const mat = new THREE.LineBasicMaterial({
+    color: 0xddeeff,
+    transparent: true,
+    opacity: 0,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+
+  const line = new THREE.Line(geom, mat);
+  scene.add(line);
+
+  return {
+    line,
+    velocity: direction.multiplyScalar(speed),
+    life: 0,
+    maxLife: 0.8 + Math.random() * 0.4,
+    tail,
+    head,
+  };
+}
+
+function disposeShootingStar(scene, meteor) {
+  scene.remove(meteor.line);
+  meteor.line.geometry.dispose();
+  meteor.line.material.dispose();
+}
+
+function updateShootingStars(scene, meteors, dt) {
+  const active = [];
+
+  for (const meteor of meteors) {
+    meteor.life += dt;
+    const t = meteor.life / meteor.maxLife;
+
+    if (t >= 1) {
+      disposeShootingStar(scene, meteor);
+      continue;
+    }
+
+    let opacity;
+    if (t < 0.15) {
+      opacity = t / 0.15;
+    } else if (t > 0.6) {
+      opacity = (1 - t) / 0.4;
+    } else {
+      opacity = 1;
+    }
+    meteor.line.material.opacity = Math.max(0, opacity) * 0.95;
+
+    meteor.tail.addScaledVector(meteor.velocity, dt);
+    meteor.head.addScaledVector(meteor.velocity, dt);
+
+    const pos = meteor.line.geometry.attributes.position.array;
+    pos[0] = meteor.tail.x;
+    pos[1] = meteor.tail.y;
+    pos[2] = meteor.tail.z;
+    pos[3] = meteor.head.x;
+    pos[4] = meteor.head.y;
+    pos[5] = meteor.head.z;
+    meteor.line.geometry.attributes.position.needsUpdate = true;
+
+    active.push(meteor);
+  }
+
+  return active;
+}
+
+function scheduleNextShootingStar(elapsed) {
+  return (
+    elapsed +
+    SHOOTING_STAR_SPAWN_MIN_S +
+    Math.random() * (SHOOTING_STAR_SPAWN_MAX_S - SHOOTING_STAR_SPAWN_MIN_S)
+  );
 }
 
 export default function UniverseBackground({ darkMode }) {
@@ -295,10 +410,16 @@ export default function UniverseBackground({ darkMode }) {
     let progress = darkModeRef.current ? 1 : 0;
     const clock = new THREE.Clock();
     let frameId;
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    let shootingStars = [];
+    let nextShootingStarAt = scheduleNextShootingStar(clock.getElapsedTime());
 
     const animate = () => {
       frameId = requestAnimationFrame(animate);
       const dt = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
 
       saturn.rotation.y -= dt * 0.05;
       ring.rotation.z -= dt * 0.05;
@@ -309,6 +430,7 @@ export default function UniverseBackground({ darkMode }) {
       camera.position.y +=
         (BASE_CAM.y + targetY * -0.25 - camera.position.y) * 0.02;
       camera.lookAt(0, 0, 0);
+      camera.updateMatrixWorld();
 
       const target = darkModeRef.current ? 1 : 0;
       if (Math.abs(progress - target) > 0.001) {
@@ -323,6 +445,18 @@ export default function UniverseBackground({ darkMode }) {
         renderer.toneMappingExposure = lerp(l.exposure, d.exposure, progress);
       }
 
+      if (
+        !prefersReducedMotion &&
+        progress > SHOOTING_STAR_DARK_THRESHOLD &&
+        shootingStars.length === 0 &&
+        elapsed >= nextShootingStarAt
+      ) {
+        shootingStars.push(spawnShootingStar(scene, camera));
+        nextShootingStarAt = scheduleNextShootingStar(elapsed);
+      }
+
+      shootingStars = updateShootingStars(scene, shootingStars, dt);
+
       renderer.render(scene, camera);
     };
     animate();
@@ -331,6 +465,9 @@ export default function UniverseBackground({ darkMode }) {
       cancelAnimationFrame(frameId);
       window.removeEventListener('resize', onResize);
       window.removeEventListener('pointermove', onPointerMove);
+
+      shootingStars.forEach((meteor) => disposeShootingStar(scene, meteor));
+      shootingStars = [];
 
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose();
