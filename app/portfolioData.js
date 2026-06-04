@@ -8,7 +8,7 @@ export const portfolioData = {
   phone: '078 247 44 53',
   email: 'mat.cerelappo@gmail.com',
   github: 'https://github.com/im24b-ceresettim',
-  profileImage: '/Myimage.jpeg',
+  profileImage: '/myimage.jpeg',
   languages: [
     { name: 'Italienisch', level: 'C2 (Diplom: B2)', flag: 'it' },
     { name: 'Deutsch', level: 'B2', flag: 'de' },
