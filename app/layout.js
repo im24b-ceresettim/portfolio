@@ -169,6 +169,8 @@ export default function RootLayout({ children }) {
     if (typeof window === "undefined") return;
 
     const COMPACT_MAX_WIDTH = 1030;
+    const PHONE_MAX_WIDTH = 600;
+    const isPhoneMode = () => window.innerWidth <= PHONE_MAX_WIDTH;
     const SCROLL_EDGE_TOLERANCE = 8;
     const WHEEL_ACCUMULATE_MS = 120;
     const WHEEL_SNAP_THRESHOLD = 50;
@@ -269,6 +271,7 @@ export default function RootLayout({ children }) {
     };
 
     const clampScrollBounds = () => {
+      if (isPhoneMode()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
       if (window.innerWidth > COMPACT_MAX_WIDTH) return;
 
@@ -424,6 +427,7 @@ export default function RootLayout({ children }) {
     };
 
     const settleToSection = () => {
+      if (isPhoneMode()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
       if (Date.now() < skipSettleUntilRef.current) return;
 
@@ -471,6 +475,8 @@ export default function RootLayout({ children }) {
     };
 
     const handleWheel = (event) => {
+      if (isPhoneMode()) return;
+
       if (isAutoScrollingRef.current) {
         event.preventDefault();
         return;
@@ -562,6 +568,7 @@ export default function RootLayout({ children }) {
     let touchStartY = null;
 
     const runPostScrollCorrection = () => {
+      if (isPhoneMode()) return;
       if (isTouchActiveRef.current) return;
 
       clampScrollBounds();
@@ -577,6 +584,7 @@ export default function RootLayout({ children }) {
     };
 
     const scheduleClamp = () => {
+      if (isPhoneMode()) return;
       if (isTouchActiveRef.current) return;
 
       if (clampRaf !== null) {
@@ -590,6 +598,7 @@ export default function RootLayout({ children }) {
     };
 
     const scheduleSettle = () => {
+      if (isPhoneMode()) return;
       if (isTouchActiveRef.current) return;
 
       if (settleTimer !== null) {
@@ -603,11 +612,13 @@ export default function RootLayout({ children }) {
     };
 
     const handleScroll = () => {
+      if (isPhoneMode()) return;
       scheduleClamp();
       scheduleSettle();
     };
 
     const handleScrollEnd = () => {
+      if (isPhoneMode()) return;
       if (isTouchActiveRef.current) return;
 
       if (settleTimer !== null) {
@@ -618,6 +629,13 @@ export default function RootLayout({ children }) {
     };
 
     const finishTouchGesture = (endY) => {
+      if (isPhoneMode()) {
+        isTouchActiveRef.current = false;
+        touchStartY = null;
+        pendingTouchSettleRef.current = false;
+        return;
+      }
+
       isTouchActiveRef.current = false;
 
       if (touchStartY === null) {
@@ -653,6 +671,7 @@ export default function RootLayout({ children }) {
     };
 
     const handleTouchStart = (event) => {
+      if (isPhoneMode()) return;
       if (event.touches.length !== 1) return;
       isTouchActiveRef.current = true;
       pendingTouchSettleRef.current = false;
@@ -660,6 +679,7 @@ export default function RootLayout({ children }) {
     };
 
     const handleTouchEnd = (event) => {
+      if (isPhoneMode()) return;
       if (event.changedTouches.length === 0) {
         finishTouchGesture(touchStartY ?? 0);
         return;
@@ -668,6 +688,7 @@ export default function RootLayout({ children }) {
     };
 
     const handleTouchCancel = () => {
+      if (isPhoneMode()) return;
       finishTouchGesture(touchStartY ?? 0);
     };
 
