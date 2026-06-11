@@ -19,6 +19,15 @@ const PHONE_MAX_WIDTH = 600;
 const isPhoneMode = () =>
   typeof window !== "undefined" && window.innerWidth <= PHONE_MAX_WIDTH;
 
+const isOverlayLockActive = () => {
+  if (typeof document === "undefined") return false;
+  const html = document.documentElement;
+  return (
+    html.classList.contains("lightbox-open") ||
+    html.classList.contains("menu-open")
+  );
+};
+
 export default function RootLayout({ children }) {
   const [showSun, setShowSun] = useState(true);
   const [lightmode, setLightmode] = useState(true);
@@ -155,7 +164,7 @@ export default function RootLayout({ children }) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (isClampingRef.current) return;
+        if (isClampingRef.current || isOverlayLockActive()) return;
 
         const visibleEntry = entries.find((entry) => entry.isIntersecting);
         if (!visibleEntry?.target?.id) return;
@@ -283,6 +292,7 @@ export default function RootLayout({ children }) {
 
     const clampScrollBounds = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
       if (performance.now() < programmaticScrollUntilRef.current) return;
       if (window.innerWidth > COMPACT_MAX_WIDTH) return;
@@ -440,6 +450,7 @@ export default function RootLayout({ children }) {
 
     const settleToSection = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
       if (performance.now() < programmaticScrollUntilRef.current) return;
       if (Date.now() < skipSettleUntilRef.current) return;
@@ -489,6 +500,7 @@ export default function RootLayout({ children }) {
 
     const handleWheel = (event) => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
 
       if (isAutoScrollingRef.current) {
         event.preventDefault();
@@ -582,6 +594,7 @@ export default function RootLayout({ children }) {
 
     const runPostScrollCorrection = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (isTouchActiveRef.current) return;
 
       clampScrollBounds();
@@ -626,12 +639,14 @@ export default function RootLayout({ children }) {
 
     const handleScroll = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       scheduleClamp();
       scheduleSettle();
     };
 
     const handleScrollEnd = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (isTouchActiveRef.current) return;
 
       if (settleTimer !== null) {
@@ -685,6 +700,7 @@ export default function RootLayout({ children }) {
 
     const handleTouchStart = (event) => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (event.touches.length !== 1) return;
       isTouchActiveRef.current = true;
       pendingTouchSettleRef.current = false;
@@ -693,6 +709,7 @@ export default function RootLayout({ children }) {
 
     const handleTouchEnd = (event) => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       if (event.changedTouches.length === 0) {
         finishTouchGesture(touchStartY ?? 0);
         return;
@@ -702,6 +719,7 @@ export default function RootLayout({ children }) {
 
     const handleTouchCancel = () => {
       if (isPhoneMode()) return;
+      if (isOverlayLockActive()) return;
       finishTouchGesture(touchStartY ?? 0);
     };
 

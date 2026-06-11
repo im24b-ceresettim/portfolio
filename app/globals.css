@@ -252,8 +252,9 @@ html.dark .ios-switch-track::after {
   .sun--drawer-slot,
   .ios-switch-track,
   .ios-switch-track::after,
-  .profile-lightbox-backdrop,
-  .profile-lightbox-image {
+  .lightbox-backdrop,
+  .profile-lightbox-image,
+  .project-lightbox-panel {
     transition: none;
   }
 }
@@ -351,7 +352,7 @@ html.dark .page-section {
   }
 }
 
-.profile-lightbox-backdrop {
+.lightbox-backdrop {
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -364,7 +365,7 @@ html.dark .page-section {
   transition: opacity 0.6s ease, background-color 0.6s ease;
 }
 
-.profile-lightbox-backdrop.is-active {
+.lightbox-backdrop.is-active {
   opacity: 1;
   background: rgba(0, 0, 0, 0.75);
 }
@@ -389,7 +390,37 @@ html.dark .page-section {
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
-.profile-lightbox-backdrop.is-active .profile-lightbox-image {
+.lightbox-backdrop.is-active .profile-lightbox-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.project-lightbox-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: min(90vw, 640px);
+  min-height: min(32rem, 85vh);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  padding: 2.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+html.dark .project-lightbox-panel {
+  background: rgba(20, 20, 22, 0.95);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.lightbox-backdrop.is-active .project-lightbox-panel {
   opacity: 1;
   transform: scale(1);
 }
@@ -466,6 +497,12 @@ h2 {
   transform: translateY(-6px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border-color: rgba(0, 0, 0, 0.15);
+}
+
+@media (min-width: 601px) {
+  .project-card--interactive {
+    cursor: pointer;
+  }
 }
 
 html.dark .project-card {
