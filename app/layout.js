@@ -846,34 +846,36 @@ export default function RootLayout({ children }) {
             </div>
 
             <div className="nav-drawer-theme">
-              <div className="sun-div sun-div--drawer" data-hover-disabled="true">
-                <Image
-                  className={showSun ? "sun" : "sun hidden"}
-                  src="/sun.png"
-                  alt=""
-                  width={36}
-                  height={36}
-                  aria-hidden
-                />
-                <Image
-                  className={showSun ? "sun-outline" : "sun-outline hidden"}
-                  src="/sun-outline.png"
-                  alt=""
-                  width={36}
-                  height={36}
-                  aria-hidden
-                />
+              <div className="nav-drawer-theme-controls">
+                <div className="sun-div sun-div--drawer" data-hover-disabled="true">
+                  <Image
+                    className={lightmode ? "sun" : "sun hidden"}
+                    src="/sun.png"
+                    alt=""
+                    width={36}
+                    height={36}
+                    aria-hidden
+                  />
+                  <Image
+                    className={lightmode ? "sun-outline hidden" : "sun-outline"}
+                    src="/sun-outline.png"
+                    alt=""
+                    width={36}
+                    height={36}
+                    aria-hidden
+                  />
+                </div>
+                <label className="ios-switch">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={!lightmode}
+                    onChange={toggleTheme}
+                    aria-label="Dark mode"
+                  />
+                  <span className="ios-switch-track" aria-hidden />
+                </label>
               </div>
-              <label className="ios-switch">
-                <input
-                  type="checkbox"
-                  role="switch"
-                  checked={!lightmode}
-                  onChange={toggleTheme}
-                  aria-label="Dark mode"
-                />
-                <span className="ios-switch-track" aria-hidden />
-              </label>
             </div>
           </aside>
         </nav>
