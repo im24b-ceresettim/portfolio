@@ -18,6 +18,7 @@ export default function RootLayout({ children }) {
   const [lightmode, setLightmode] = useState(true);
   const [isHoverDisabled, setIsHoverDisabled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -720,16 +721,40 @@ export default function RootLayout({ children }) {
     };
   }, [getStickyNavOffset, scrollToSection, stopAnimation, updateUrlForSection]);
 
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeMenu();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen, closeMenu]);
+
   const handleNavClick = (event, item) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {
       event.preventDefault();
       smoothScrollToSection(item.id);
     }
+    closeMenu();
   };
 
-  const handleClick = () => {
-    setLightmode(!lightmode);
-    setShowSun(!showSun);
+  const toggleTheme = () => {
+    setLightmode((current) => !current);
+    setShowSun((current) => !current);
     setIsHoverDisabled(true);
   };
 
@@ -743,7 +768,20 @@ export default function RootLayout({ children }) {
         <UniverseBackground darkMode={!lightmode} />
         <div className="content-layer">
         <nav>
-          <div className="flex nav-links">
+          <button
+            type="button"
+            className={`nav-burger ${menuOpen ? "is-open" : ""}`}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav-drawer"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={toggleMenu}
+          >
+            <span className="nav-burger-line" />
+            <span className="nav-burger-line" />
+            <span className="nav-burger-line" />
+          </button>
+
+          <div className="flex nav-links nav-links--desktop">
             {navItems.map((item) => (
               <Link
                 key={item.id}
@@ -757,7 +795,7 @@ export default function RootLayout({ children }) {
             ))}
           </div>
 
-          <div className="nav-controls">
+          <div className="nav-controls nav-controls--desktop">
             <div
               className="sun-div"
               onMouseLeave={handleMouseLeave}
@@ -769,7 +807,7 @@ export default function RootLayout({ children }) {
                 alt="sun"
                 width={40}
                 height={40}
-                onClick={handleClick}
+                onClick={toggleTheme}
               />
               <Image
                 className={showSun ? "sun-outline" : "sun-outline hidden"}
@@ -777,10 +815,67 @@ export default function RootLayout({ children }) {
                 alt="sun"
                 width={40}
                 height={40}
-                onClick={handleClick}
+                onClick={toggleTheme}
               />
             </div>
           </div>
+
+          <div
+            className={`nav-drawer-backdrop ${menuOpen ? "is-open" : ""}`}
+            onClick={closeMenu}
+            aria-hidden={!menuOpen}
+          />
+
+          <aside
+            id="mobile-nav-drawer"
+            className={`nav-drawer ${menuOpen ? "is-open" : ""}`}
+            aria-hidden={!menuOpen}
+          >
+            <div className="nav-drawer-links">
+              {navItems.map((item) => (
+                <Link
+                  key={item.id}
+                  className={`block nav-link ${activeSection === item.id ? "active" : ""}`}
+                  href={item.href}
+                  onClick={(event) => handleNavClick(event, item)}
+                  aria-current={activeSection === item.id ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="nav-drawer-theme">
+              <div className="sun-div sun-div--drawer" data-hover-disabled="true">
+                <Image
+                  className={showSun ? "sun" : "sun hidden"}
+                  src="/sun.png"
+                  alt=""
+                  width={36}
+                  height={36}
+                  aria-hidden
+                />
+                <Image
+                  className={showSun ? "sun-outline" : "sun-outline hidden"}
+                  src="/sun-outline.png"
+                  alt=""
+                  width={36}
+                  height={36}
+                  aria-hidden
+                />
+              </div>
+              <label className="ios-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  checked={!lightmode}
+                  onChange={toggleTheme}
+                  aria-label="Dark mode"
+                />
+                <span className="ios-switch-track" aria-hidden />
+              </label>
+            </div>
+          </aside>
         </nav>
         {children}
         </div>

@@ -70,6 +70,194 @@ nav {
   padding-right: 10px;
 }
 
+.nav-burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.nav-burger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.nav-burger.is-open .nav-burger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-burger.is-open .nav-burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-burger.is-open .nav-burger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.nav-drawer-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav-drawer-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: min(85vw, 300px);
+  height: 100%;
+  flex-direction: column;
+  background: rgb(255, 255, 255);
+  border-right: 1px solid black;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+html.dark .nav-drawer {
+  background: rgb(0, 0, 0);
+  border-color: #ffffff;
+}
+
+.nav-drawer.is-open {
+  transform: translateX(0);
+}
+
+.nav-drawer-links {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nav-drawer-links .nav-link {
+  border-right: none;
+  border-bottom: 1px dashed black;
+}
+
+html.dark .nav-drawer-links .nav-link {
+  border-color: white;
+}
+
+.nav-drawer-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px dashed black;
+  flex-shrink: 0;
+}
+
+html.dark .nav-drawer-theme {
+  border-color: white;
+}
+
+.sun-div--drawer {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.sun-div--drawer .sun,
+.sun-div--drawer .sun-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.ios-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ios-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ios-switch-track {
+  position: relative;
+  display: block;
+  width: 51px;
+  height: 31px;
+  background: #e9e9ea;
+  border-radius: 31px;
+  transition: background-color 0.25s ease;
+}
+
+.ios-switch-track::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease;
+}
+
+.ios-switch input:checked + .ios-switch-track {
+  background: #34c759;
+}
+
+.ios-switch input:checked + .ios-switch-track::after {
+  transform: translateX(20px);
+}
+
+html.dark .ios-switch-track {
+  background: #39393d;
+}
+
+html.dark .ios-switch-track::after {
+  background: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-burger-line,
+  .nav-drawer,
+  .nav-drawer-backdrop,
+  .ios-switch-track,
+  .ios-switch-track::after {
+    transition: none;
+  }
+}
+
 html.dark nav {
   background: rgb(0, 0, 0);
   border-color: #ffffff;
@@ -292,24 +480,31 @@ html.dark .tech-tag {
 
 @media (max-width: 600px) {
   nav {
-    align-items: stretch;
+    align-items: center;
+    min-height: 48px;
   }
 
-  .nav-links {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+  .nav-burger {
+    display: flex;
+    color: black;
   }
 
-  .nav-links::-webkit-scrollbar {
+  html.dark .nav-burger {
+    color: white;
+  }
+
+  .nav-links--desktop,
+  .nav-controls--desktop {
     display: none;
   }
 
-  .nav-link {
-    padding: 14px 12px;
-    border-right-style: solid;
-    flex: 0 0 auto;
+  .nav-drawer-backdrop,
+  .nav-drawer {
+    display: flex;
+  }
+
+  .nav-drawer-links .nav-link {
+    padding: 16px 1.25rem;
     white-space: nowrap;
   }
 
