@@ -831,19 +831,6 @@ export default function RootLayout({ children }) {
         <UniverseBackground darkMode={!lightmode} />
         <div className="content-layer">
         <nav>
-          <button
-            type="button"
-            className={`nav-burger ${menuOpen ? "is-open" : ""}`}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-nav-drawer"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            onClick={toggleMenu}
-          >
-            <span className="nav-burger-line" />
-            <span className="nav-burger-line" />
-            <span className="nav-burger-line" />
-          </button>
-
           <div className="flex nav-links nav-links--desktop">
             {navItems.map((item) => (
               <Link
@@ -910,22 +897,13 @@ export default function RootLayout({ children }) {
 
             <div className="nav-drawer-theme">
               <div className="nav-drawer-theme-controls">
-                <div className="sun-div sun-div--drawer" data-hover-disabled="true">
+                <div className="sun-div sun-div--drawer" data-hover-disabled="true" aria-hidden>
                   <Image
-                    className={lightmode ? "sun" : "sun hidden"}
+                    className={`sun sun--drawer-slot ${lightmode ? "is-visible" : "is-hidden"}`}
                     src="/sun.png"
                     alt=""
                     width={36}
                     height={36}
-                    aria-hidden
-                  />
-                  <Image
-                    className={lightmode ? "sun-outline hidden" : "sun-outline"}
-                    src="/sun-outline.png"
-                    alt=""
-                    width={36}
-                    height={36}
-                    aria-hidden
                   />
                 </div>
                 <label className="ios-switch">
@@ -938,9 +916,31 @@ export default function RootLayout({ children }) {
                   />
                   <span className="ios-switch-track" aria-hidden />
                 </label>
+                <div className="sun-div sun-div--drawer" data-hover-disabled="true" aria-hidden>
+                  <Image
+                    className={`sun-outline sun--drawer-slot ${lightmode ? "is-hidden" : "is-visible"}`}
+                    src="/sun-outline.png"
+                    alt=""
+                    width={36}
+                    height={36}
+                  />
+                </div>
               </div>
             </div>
           </aside>
+
+          <button
+            type="button"
+            className="nav-burger"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav-drawer"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={toggleMenu}
+          >
+            <span className="nav-burger-line" />
+            <span className="nav-burger-line" />
+            <span className="nav-burger-line" />
+          </button>
         </nav>
         {children}
         </div>

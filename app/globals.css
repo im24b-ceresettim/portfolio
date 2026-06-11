@@ -90,19 +90,6 @@ nav {
   height: 2px;
   background: currentColor;
   border-radius: 1px;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-
-.nav-burger.is-open .nav-burger-line:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.nav-burger.is-open .nav-burger-line:nth-child(2) {
-  opacity: 0;
-}
-
-.nav-burger.is-open .nav-burger-line:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
 }
 
 .nav-drawer-backdrop {
@@ -125,14 +112,14 @@ nav {
   display: none;
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
   z-index: 50;
   width: min(72vw, 250px);
   height: 100%;
   flex-direction: column;
   background: rgb(255, 255, 255);
-  border-right: 1px solid black;
-  transform: translateX(-100%);
+  border-left: 1px solid black;
+  transform: translateX(100%);
   transition: transform 0.3s ease;
 }
 
@@ -182,31 +169,20 @@ html.dark .nav-drawer-links .nav-link {
   flex-shrink: 0;
 }
 
-.sun-div--drawer .sun,
-.sun-div--drawer .sun-outline {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.sun-div--drawer .sun:not(.hidden) {
+.sun-div--drawer .sun--drawer-slot {
   display: block;
+  transition: opacity 0.2s ease;
 }
 
-.sun-div--drawer .sun.hidden {
-  display: none;
+.sun--drawer-slot.is-visible {
+  opacity: 1;
 }
 
-.sun-div--drawer .sun-outline:not(.hidden) {
-  display: block;
+.sun--drawer-slot.is-hidden {
+  opacity: 0;
 }
 
-.sun-div--drawer .sun-outline.hidden {
-  display: none;
-}
-
-html.dark .sun-div--drawer .sun:not(.hidden),
-html.dark .sun-div--drawer .sun-outline:not(.hidden) {
+html.dark .sun-div--drawer .sun--drawer-slot.is-visible {
   filter: invert(1);
 }
 
@@ -270,9 +246,9 @@ html.dark .ios-switch-track::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nav-burger-line,
   .nav-drawer,
   .nav-drawer-backdrop,
+  .sun--drawer-slot,
   .ios-switch-track,
   .ios-switch-track::after {
     transition: none;
@@ -510,16 +486,23 @@ html.dark .tech-tag {
 
   nav {
     align-items: center;
+    justify-content: flex-end;
     min-height: 48px;
   }
 
   .nav-burger {
     display: flex;
+    position: relative;
+    z-index: 51;
     color: black;
   }
 
   html.dark .nav-burger {
     color: white;
+  }
+
+  html.menu-open .nav-burger {
+    display: none;
   }
 
   .nav-links--desktop,
@@ -533,7 +516,6 @@ html.dark .tech-tag {
   }
 
   .nav-drawer-theme {
-    justify-content: flex-end;
     width: 100%;
   }
 
