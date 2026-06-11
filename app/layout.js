@@ -13,6 +13,11 @@ const navItems = [
   { id: "contact", label: "contact", href: "/#contact" },
 ];
 
+const PHONE_MAX_WIDTH = 600;
+
+const isPhoneMode = () =>
+  typeof window !== "undefined" && window.innerWidth <= PHONE_MAX_WIDTH;
+
 export default function RootLayout({ children }) {
   const [showSun, setShowSun] = useState(true);
   const [lightmode, setLightmode] = useState(true);
@@ -36,6 +41,8 @@ export default function RootLayout({ children }) {
   const isClampingRef = useRef(false);
   const animationFrameRef = useRef(null);
   const skipSettleUntilRef = useRef(0);
+  const programmaticScrollUntilRef = useRef(0);
+  const pendingNavScrollRef = useRef(null);
   const hasSnappedThisGestureRef = useRef(false);
   const isTouchActiveRef = useRef(false);
   const pendingTouchSettleRef = useRef(false);
@@ -93,7 +100,10 @@ export default function RootLayout({ children }) {
 
       isAutoScrollingRef.current = true;
       const startY = window.scrollY;
-      const duration = 350;
+      const duration = isPhoneMode() ? 700 : 550;
+      const guardUntil = performance.now() + duration + 450;
+      programmaticScrollUntilRef.current = guardUntil;
+      skipSettleUntilRef.current = Date.now() + duration + 450;
       const startTime = performance.now();
 
       const step = (now) => {
@@ -171,8 +181,6 @@ export default function RootLayout({ children }) {
     if (typeof window === "undefined") return;
 
     const COMPACT_MAX_WIDTH = 1030;
-    const PHONE_MAX_WIDTH = 600;
-    const isPhoneMode = () => window.innerWidth <= PHONE_MAX_WIDTH;
     const SCROLL_EDGE_TOLERANCE = 8;
     const WHEEL_ACCUMULATE_MS = 120;
     const WHEEL_SNAP_THRESHOLD = 50;
@@ -275,6 +283,7 @@ export default function RootLayout({ children }) {
     const clampScrollBounds = () => {
       if (isPhoneMode()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
+      if (performance.now() < programmaticScrollUntilRef.current) return;
       if (window.innerWidth > COMPACT_MAX_WIDTH) return;
 
       const navOffset = getStickyNavOffset();
@@ -431,6 +440,7 @@ export default function RootLayout({ children }) {
     const settleToSection = () => {
       if (isPhoneMode()) return;
       if (isAutoScrollingRef.current || isClampingRef.current) return;
+      if (performance.now() < programmaticScrollUntilRef.current) return;
       if (Date.now() < skipSettleUntilRef.current) return;
 
       const navOffset = getStickyNavOffset();
@@ -764,6 +774,17 @@ export default function RootLayout({ children }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen, closeMenu]);
 
+  useEffect(() => {
+    if (menuOpen || !pendingNavScrollRef.current) return;
+
+    const targetId = pendingNavScrollRef.current;
+    pendingNavScrollRef.current = null;
+
+    requestAnimationFrame(() => {
+      smoothScrollToSection(targetId);
+    });
+  }, [menuOpen, smoothScrollToSection]);
+
   const handleNavClick = (event, item) => {
     if (typeof window !== "undefined" && window.location.pathname === "/") {
       event.preventDefault();
@@ -784,7 +805,7 @@ export default function RootLayout({ children }) {
 
     window.setTimeout(() => {
       if (isHome) {
-        smoothScrollToSection(item.id);
+        pendingNavScrollRef.current = item.id;
       }
       closeMenu();
       setPressedNavId(null);

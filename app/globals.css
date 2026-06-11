@@ -154,7 +154,7 @@ html.dark .nav-drawer {
 
 .nav-drawer-links .nav-link {
   border-right: none;
-  border-bottom: 1px dashed black;
+  border-bottom: 1px solid black;
 }
 
 html.dark .nav-drawer-links .nav-link {
