@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import ProfileImageLightbox from './components/ProfileImageLightbox';
 import { portfolioData, projects } from './portfolioData';
 
 export default function Home() {
@@ -12,15 +13,10 @@ export default function Home() {
             <h2>{portfolioData.role}</h2>
             <p className="section-lead">{portfolioData.headline}</p>
           </div>
-          <div className="profile-placeholder" aria-label="Profilbild">
-            <Image
-              className="profile-placeholder-image"
-              src={portfolioData.profileImage}
-              alt="Profilbild"
-              width={220}
-              height={220}
-            />
-          </div>
+          <ProfileImageLightbox
+            src={portfolioData.profileImage}
+            alt="Profilbild"
+          />
         </div>
       </section>
 

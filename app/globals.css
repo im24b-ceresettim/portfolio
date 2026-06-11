@@ -250,7 +250,9 @@ html.dark .ios-switch-track::after {
   .nav-drawer-backdrop,
   .sun--drawer-slot,
   .ios-switch-track,
-  .ios-switch-track::after {
+  .ios-switch-track::after,
+  .profile-lightbox-backdrop,
+  .profile-lightbox-image {
     transition: none;
   }
 }
@@ -341,7 +343,64 @@ html.dark .page-section {
   object-fit: cover;
   display: block;
 }
- 
+
+@media (min-width: 601px) {
+  .profile-placeholder--interactive {
+    cursor: pointer;
+  }
+}
+
+.profile-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.35s ease, background-color 0.35s ease;
+}
+
+.profile-lightbox-backdrop.is-active {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.profile-lightbox-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.profile-lightbox-image {
+  max-width: min(90vw, 560px);
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 14px;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.profile-lightbox-backdrop.is-active .profile-lightbox-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+html.lightbox-open {
+  overflow: hidden;
+}
+
+html.lightbox-open body {
+  overflow: hidden;
+}
+
 @media (max-width: 1030px) {
   .home-layout {
     flex-direction: column;
