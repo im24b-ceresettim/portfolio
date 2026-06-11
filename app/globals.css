@@ -166,7 +166,6 @@ html.dark .nav-drawer-links .nav-link {
   align-items: center;
   justify-content: flex-start;
   padding: 1rem 1.25rem;
-  border-top: 1px dashed black;
   flex-shrink: 0;
 }
 
@@ -174,10 +173,6 @@ html.dark .nav-drawer-links .nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-html.dark .nav-drawer-theme {
-  border-color: white;
 }
 
 .sun-div--drawer {
@@ -505,6 +500,14 @@ html.dark .tech-tag {
 }
 
 @media (max-width: 600px) {
+  html.menu-open {
+    overflow: hidden;
+  }
+
+  html.menu-open body {
+    overflow: hidden;
+  }
+
   nav {
     align-items: center;
     min-height: 48px;
@@ -529,17 +532,32 @@ html.dark .tech-tag {
     display: flex;
   }
 
+  .nav-drawer-theme {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
   .nav-drawer-links .nav-link {
     padding: 16px 1.25rem;
     white-space: nowrap;
   }
 
-  .nav-drawer-links .nav-link:hover {
+  .nav-drawer-links .nav-link:not(.active):hover {
+    color: black;
+    background-color: white;
+  }
+
+  html.dark .nav-drawer-links .nav-link:not(.active):hover {
+    background: black;
+    color: white;
+  }
+
+  .nav-drawer-links .nav-link--pressed {
     color: white;
     background-color: black;
   }
 
-  html.dark .nav-drawer-links .nav-link:hover {
+  html.dark .nav-drawer-links .nav-link--pressed {
     background: white;
     color: black;
   }

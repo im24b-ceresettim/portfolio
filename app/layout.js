@@ -19,6 +19,7 @@ export default function RootLayout({ children }) {
   const [isHoverDisabled, setIsHoverDisabled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pressedNavId, setPressedNavId] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -726,10 +727,29 @@ export default function RootLayout({ children }) {
 
   useEffect(() => {
     if (!menuOpen) return;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+
+    const scrollY = window.scrollY;
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyPosition = body.style.position;
+    const previousBodyTop = body.style.top;
+    const previousBodyWidth = body.style.width;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.width = "100%";
+    body.style.top = `-${scrollY}px`;
+
     return () => {
-      document.body.style.overflow = previousOverflow;
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.position = previousBodyPosition;
+      body.style.top = previousBodyTop;
+      body.style.width = previousBodyWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [menuOpen]);
 
@@ -752,6 +772,25 @@ export default function RootLayout({ children }) {
     closeMenu();
   };
 
+  const handleDrawerNavClick = (event, item) => {
+    const isHome =
+      typeof window !== "undefined" && window.location.pathname === "/";
+
+    if (isHome) {
+      event.preventDefault();
+    }
+
+    setPressedNavId(item.id);
+
+    window.setTimeout(() => {
+      if (isHome) {
+        smoothScrollToSection(item.id);
+      }
+      closeMenu();
+      setPressedNavId(null);
+    }, 160);
+  };
+
   const toggleTheme = () => {
     setLightmode((current) => !current);
     setShowSun((current) => !current);
@@ -763,7 +802,10 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en" className={lightmode ? "light" : "dark"}>
+    <html
+      lang="en"
+      className={`${lightmode ? "light" : "dark"}${menuOpen ? " menu-open" : ""}`}
+    >
       <body>
         <UniverseBackground darkMode={!lightmode} />
         <div className="content-layer">
@@ -835,9 +877,9 @@ export default function RootLayout({ children }) {
               {navItems.map((item) => (
                 <Link
                   key={item.id}
-                  className={`block nav-link ${activeSection === item.id ? "active" : ""}`}
+                  className={`block nav-link${activeSection === item.id ? " active" : ""}${pressedNavId === item.id ? " nav-link--pressed" : ""}`}
                   href={item.href}
-                  onClick={(event) => handleNavClick(event, item)}
+                  onClick={(event) => handleDrawerNavClick(event, item)}
                   aria-current={activeSection === item.id ? "page" : undefined}
                 >
                   {item.label}
