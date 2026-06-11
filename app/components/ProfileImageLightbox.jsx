@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
+import { lockBodyScroll } from '../utils/lockBodyScroll';
 
 const PHONE_MAX_WIDTH = 600;
-const LIGHTBOX_TRANSITION_MS = 350;
+const LIGHTBOX_TRANSITION_MS = 600;
 
 const isInteractiveViewport = () =>
   typeof window !== 'undefined' && window.innerWidth > PHONE_MAX_WIDTH;
@@ -39,30 +40,13 @@ export default function ProfileImageLightbox({ src, alt }) {
   useEffect(() => {
     if (!isOpen) return;
 
-    const scrollY = window.scrollY;
     const html = document.documentElement;
-    const body = document.body;
-    const previousHtmlOverflow = html.style.overflow;
-    const previousBodyOverflow = body.style.overflow;
-    const previousBodyPosition = body.style.position;
-    const previousBodyTop = body.style.top;
-    const previousBodyWidth = body.style.width;
-
     html.classList.add('lightbox-open');
-    html.style.overflow = 'hidden';
-    body.style.overflow = 'hidden';
-    body.style.position = 'fixed';
-    body.style.width = '100%';
-    body.style.top = `-${scrollY}px`;
+    const unlock = lockBodyScroll();
 
     return () => {
       html.classList.remove('lightbox-open');
-      html.style.overflow = previousHtmlOverflow;
-      body.style.overflow = previousBodyOverflow;
-      body.style.position = previousBodyPosition;
-      body.style.top = previousBodyTop;
-      body.style.width = previousBodyWidth;
-      window.scrollTo(0, scrollY);
+      unlock();
     };
   }, [isOpen]);
 

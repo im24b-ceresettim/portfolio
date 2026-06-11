@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import UniverseBackground from "./components/UniverseBackground";
+import { lockBodyScroll } from "./utils/lockBodyScroll";
 
 const navItems = [
   { id: "home", label: "home", href: "/" },
@@ -737,30 +738,7 @@ export default function RootLayout({ children }) {
 
   useEffect(() => {
     if (!menuOpen) return;
-
-    const scrollY = window.scrollY;
-    const html = document.documentElement;
-    const body = document.body;
-    const previousHtmlOverflow = html.style.overflow;
-    const previousBodyOverflow = body.style.overflow;
-    const previousBodyPosition = body.style.position;
-    const previousBodyTop = body.style.top;
-    const previousBodyWidth = body.style.width;
-
-    html.style.overflow = "hidden";
-    body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.width = "100%";
-    body.style.top = `-${scrollY}px`;
-
-    return () => {
-      html.style.overflow = previousHtmlOverflow;
-      body.style.overflow = previousBodyOverflow;
-      body.style.position = previousBodyPosition;
-      body.style.top = previousBodyTop;
-      body.style.width = previousBodyWidth;
-      window.scrollTo(0, scrollY);
-    };
+    return lockBodyScroll();
   }, [menuOpen]);
 
   useEffect(() => {
