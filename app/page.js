@@ -1,10 +1,13 @@
 import Image from 'next/image';
+import { unstable_noStore as noStore } from 'next/cache';
 import ProfileImageLightbox from './components/ProfileImageLightbox';
 import ProjectCard from './components/ProjectCard';
 import { portfolioData, projects } from './portfolioData';
 import { getProjectImages } from './utils/getProjectImages';
 
 export default function Home() {
+  noStore();
+
   return (
     <main>
       <section id="home" className="page-section">

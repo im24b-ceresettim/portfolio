@@ -3,6 +3,8 @@ import path from 'path';
 
 const IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
 
+export { getProjectLightboxMode } from './projectLightboxMode';
+
 export function getProjectImages(slug) {
   if (!slug) return [];
 
@@ -14,5 +16,5 @@ export function getProjectImages(slug) {
     .readdirSync(dir)
     .filter((file) => IMAGE_EXTENSIONS.has(path.extname(file).toLowerCase()))
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    .map((file) => `/projects/${slug}/${file}`);
+    .map((file) => `/projects/${slug}/${encodeURIComponent(file)}`);
 }

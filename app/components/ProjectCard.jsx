@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { useLightbox } from '../hooks/useLightbox';
+import { getProjectLightboxMode } from '../utils/projectLightboxMode';
 import ProjectImageCarousel from './ProjectImageCarousel';
 
 function GithubIcon() {
@@ -119,12 +120,9 @@ export default function ProjectCard({ project, images = [] }) {
   const techTags = project.stack
     ? project.stack.split(',').map((s) => s.trim())
     : [];
-  const layout = project.layout ?? 'actual';
-  const usesImageLayout =
-    (layout === 'onepicture' || layout === 'multipicture') &&
-    images.length > 0;
-  const displayImages =
-    layout === 'onepicture' ? images.slice(0, 1) : images;
+  const lightboxMode = getProjectLightboxMode(images.length);
+  const usesImageLayout = lightboxMode !== 'standard';
+  const showCarouselArrows = lightboxMode === 'multipicture';
 
   return (
     <>
@@ -160,15 +158,14 @@ export default function ProjectCard({ project, images = [] }) {
               aria-modal="true"
               aria-label={project.title}
             >
-              <div className="project-lightbox-spacer" aria-hidden="true" />
               <div
                 className="project-lightbox-media"
                 onClick={(event) => event.stopPropagation()}
               >
                 <ProjectImageCarousel
-                  images={displayImages}
+                  images={images}
                   title={project.title}
-                  showArrows={layout === 'multipicture'}
+                  showArrows={showCarouselArrows}
                   isOpen={isOpen}
                 />
               </div>

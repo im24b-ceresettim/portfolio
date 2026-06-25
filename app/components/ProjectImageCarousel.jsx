@@ -27,8 +27,6 @@ export default function ProjectImageCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const currentImage = images[index];
-  const canGoPrev = index > 0;
-  const canGoNext = index < images.length - 1;
   const arrowsVisible = showArrows && images.length > 1;
 
   useEffect(() => {
@@ -38,22 +36,22 @@ export default function ProjectImageCarousel({
   }, [isOpen]);
 
   const goPrev = useCallback(() => {
-    setIndex((current) => Math.max(0, current - 1));
-  }, []);
+    setIndex((current) => (current - 1 + images.length) % images.length);
+  }, [images.length]);
 
   const goNext = useCallback(() => {
-    setIndex((current) => Math.min(images.length - 1, current + 1));
+    setIndex((current) => (current + 1) % images.length);
   }, [images.length]);
 
   useEffect(() => {
     if (!isOpen || !arrowsVisible) return;
 
     const handleKeyDown = (event) => {
-      if (event.key === 'ArrowLeft' && canGoPrev) {
+      if (event.key === 'ArrowLeft') {
         event.preventDefault();
         goPrev();
       }
-      if (event.key === 'ArrowRight' && canGoNext) {
+      if (event.key === 'ArrowRight') {
         event.preventDefault();
         goNext();
       }
@@ -61,7 +59,7 @@ export default function ProjectImageCarousel({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, arrowsVisible, canGoPrev, canGoNext, goPrev, goNext]);
+  }, [isOpen, arrowsVisible, goPrev, goNext]);
 
   if (!currentImage) {
     return (
@@ -72,13 +70,16 @@ export default function ProjectImageCarousel({
   }
 
   return (
-    <div className="project-lightbox-carousel">
+    <div
+      className={`project-lightbox-carousel${
+        arrowsVisible ? '' : ' project-lightbox-carousel--single'
+      }`}
+    >
       {arrowsVisible && (
         <button
           type="button"
           className="project-carousel-btn project-carousel-btn--prev"
           onClick={goPrev}
-          disabled={!canGoPrev}
           aria-label="Vorheriges Bild"
         >
           <ChevronLeft />
@@ -90,9 +91,8 @@ export default function ProjectImageCarousel({
           className="project-lightbox-media-image"
           src={currentImage}
           alt={`${title} — Bild ${index + 1} von ${images.length}`}
-          width={1200}
-          height={800}
-          sizes="33vw"
+          fill
+          sizes="42vw"
           priority
         />
       </div>
@@ -102,7 +102,6 @@ export default function ProjectImageCarousel({
           type="button"
           className="project-carousel-btn project-carousel-btn--next"
           onClick={goNext}
-          disabled={!canGoNext}
           aria-label="Nächstes Bild"
         >
           <ChevronRight />
