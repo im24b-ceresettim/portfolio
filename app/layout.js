@@ -3,7 +3,7 @@
 import "./globals.css";
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import UniverseBackground from "./components/UniverseBackground";
 import { isOverlayScrollGuardActive, lockBodyScroll } from "./utils/lockBodyScroll";
 
@@ -755,7 +755,7 @@ export default function RootLayout({ children }) {
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const toggleMenu = useCallback(() => setMenuOpen((open) => !open), []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!menuOpen) return;
     return lockBodyScroll();
   }, [menuOpen]);

@@ -562,12 +562,12 @@ html.lightbox-open body {
 
 html.lightbox-open nav,
 html.menu-open nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: auto;
-  z-index: 30;
+  pointer-events: none;
+}
+
+.nav-scroll-lock-spacer {
+  width: 100%;
+  flex-shrink: 0;
   pointer-events: none;
 }
 
