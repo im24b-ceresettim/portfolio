@@ -416,6 +416,10 @@ html.dark .page-section {
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 
+.project-lightbox-layout:has(.project-carousel-btn) {
+  gap: 4.75rem;
+}
+
 .lightbox-backdrop.is-active .project-lightbox-layout {
   opacity: 1;
   transform: scale(1);
@@ -428,14 +432,11 @@ html.dark .page-section {
   min-height: min(26rem, 72vh);
   max-height: 72vh;
   padding: 0;
+  overflow: visible;
 }
 
 .project-lightbox-carousel {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
+  position: relative;
   width: 100%;
   height: 100%;
   min-height: min(26rem, 72vh);
@@ -448,8 +449,7 @@ html.dark .page-section {
 
 .project-lightbox-media-frame {
   position: relative;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   height: 100%;
   min-height: min(26rem, 72vh);
   max-height: 72vh;
@@ -492,6 +492,21 @@ html.dark .page-section {
   color: #ffffff;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.project-lightbox-carousel:not(.project-lightbox-carousel--single) .project-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+.project-lightbox-carousel:not(.project-lightbox-carousel--single) .project-carousel-btn--prev {
+  left: calc(-2.5rem - 0.75rem);
+}
+
+.project-lightbox-carousel:not(.project-lightbox-carousel--single) .project-carousel-btn--next {
+  right: calc(-2.5rem - 0.75rem);
 }
 
 .project-carousel-btn:hover {
