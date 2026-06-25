@@ -1,6 +1,14 @@
 const getScrollbarWidth = () =>
   window.innerWidth - document.documentElement.clientWidth;
 
+export const OVERLAY_SCROLL_GUARD_MS = 900;
+
+let overlayScrollGuardUntil = 0;
+
+export function isOverlayScrollGuardActive() {
+  return performance.now() < overlayScrollGuardUntil;
+}
+
 /**
  * Locks page scroll while preserving layout width when the scrollbar hides.
  * Returns an unlock function that restores scroll position and styles.
@@ -49,5 +57,6 @@ export function lockBodyScroll() {
     body.style.paddingRight = snapshot.bodyPaddingRight;
     if (nav) nav.style.paddingRight = snapshot.navPaddingRight;
     window.scrollTo(0, snapshot.scrollY);
+    overlayScrollGuardUntil = performance.now() + OVERLAY_SCROLL_GUARD_MS;
   };
 }

@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { isInteractiveViewport, useLightbox } from '../hooks/useLightbox';
+import { useLightbox } from '../hooks/useLightbox';
+import ProjectImageCarousel from './ProjectImageCarousel';
 
 function GithubIcon() {
   return (
@@ -41,15 +42,13 @@ function LiveIcon() {
   );
 }
 
-function ProjectCardContent({ project, hasGh, hasUrl, techTags, interceptLinks }) {
+function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSurface }) {
   const handleLinkClick = useCallback(
     (event) => {
-      if (!interceptLinks || !isInteractiveViewport()) return;
-      event.preventDefault();
+      if (!onCardSurface) return;
       event.stopPropagation();
-      interceptLinks();
     },
-    [interceptLinks]
+    [onCardSurface]
   );
 
   return (
@@ -98,7 +97,20 @@ function ProjectCardContent({ project, hasGh, hasUrl, techTags, interceptLinks }
   );
 }
 
-export default function ProjectCard({ project }) {
+function ProjectLightboxPanel({ project, hasGh, hasUrl, techTags }) {
+  return (
+    <div className="project-lightbox-panel">
+      <ProjectCardContent
+        project={project}
+        hasGh={hasGh}
+        hasUrl={hasUrl}
+        techTags={techTags}
+      />
+    </div>
+  );
+}
+
+export default function ProjectCard({ project, images = [] }) {
   const { isOpen, isActive, handleOpen, handleClose, handleTriggerKeyDown } =
     useLightbox();
 
@@ -107,6 +119,12 @@ export default function ProjectCard({ project }) {
   const techTags = project.stack
     ? project.stack.split(',').map((s) => s.trim())
     : [];
+  const layout = project.layout ?? 'actual';
+  const usesImageLayout =
+    (layout === 'onepicture' || layout === 'multipicture') &&
+    images.length > 0;
+  const displayImages =
+    layout === 'onepicture' ? images.slice(0, 1) : images;
 
   return (
     <>
@@ -123,30 +141,62 @@ export default function ProjectCard({ project }) {
           hasGh={hasGh}
           hasUrl={hasUrl}
           techTags={techTags}
-          interceptLinks={handleOpen}
+          onCardSurface
         />
       </article>
 
       {isOpen && (
         <div
-          className={`lightbox-backdrop ${isActive ? 'is-active' : ''}`}
+          className={`lightbox-backdrop ${isActive ? 'is-active' : ''}${
+            usesImageLayout ? ' lightbox-backdrop--project-wide' : ''
+          }`}
           onClick={handleClose}
           role="presentation"
         >
-          <div
-            className="project-lightbox-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-label={project.title}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <ProjectCardContent
-              project={project}
-              hasGh={hasGh}
-              hasUrl={hasUrl}
-              techTags={techTags}
-            />
-          </div>
+          {usesImageLayout ? (
+            <div
+              className="project-lightbox-layout"
+              role="dialog"
+              aria-modal="true"
+              aria-label={project.title}
+            >
+              <div className="project-lightbox-spacer" aria-hidden="true" />
+              <div
+                className="project-lightbox-media"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <ProjectImageCarousel
+                  images={displayImages}
+                  title={project.title}
+                  showArrows={layout === 'multipicture'}
+                  isOpen={isOpen}
+                />
+              </div>
+              <div onClick={(event) => event.stopPropagation()}>
+                <ProjectLightboxPanel
+                  project={project}
+                  hasGh={hasGh}
+                  hasUrl={hasUrl}
+                  techTags={techTags}
+                />
+              </div>
+            </div>
+          ) : (
+            <div
+              className="project-lightbox-panel project-lightbox-panel--centered"
+              role="dialog"
+              aria-modal="true"
+              aria-label={project.title}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <ProjectCardContent
+                project={project}
+                hasGh={hasGh}
+                hasUrl={hasUrl}
+                techTags={techTags}
+              />
+            </div>
+          )}
         </div>
       )}
     </>

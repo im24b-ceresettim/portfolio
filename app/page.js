@@ -2,6 +2,7 @@ import Image from 'next/image';
 import ProfileImageLightbox from './components/ProfileImageLightbox';
 import ProjectCard from './components/ProjectCard';
 import { portfolioData, projects } from './portfolioData';
+import { getProjectImages } from './utils/getProjectImages';
 
 export default function Home() {
   return (
@@ -26,7 +27,11 @@ export default function Home() {
           <p className="section-tag">Projects</p>
           <div className="project-grid">
             {projects.map((project) => (
-              <ProjectCard key={project.title} project={project} />
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                images={getProjectImages(project.slug)}
+              />
             ))}
           </div>
         </div>

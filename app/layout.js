@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import UniverseBackground from "./components/UniverseBackground";
-import { lockBodyScroll } from "./utils/lockBodyScroll";
+import { isOverlayScrollGuardActive, lockBodyScroll } from "./utils/lockBodyScroll";
 
 const navItems = [
   { id: "home", label: "home", href: "/" },
@@ -24,7 +24,8 @@ const isOverlayLockActive = () => {
   const html = document.documentElement;
   return (
     html.classList.contains("lightbox-open") ||
-    html.classList.contains("menu-open")
+    html.classList.contains("menu-open") ||
+    isOverlayScrollGuardActive()
   );
 };
 

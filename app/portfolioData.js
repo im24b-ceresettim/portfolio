@@ -40,6 +40,8 @@ export const portfolioData = {
 
 export const projects = [
   {
+    slug: 'sbb-lore',
+    layout: 'multipicture',
     title: 'SBB-Lore',
     description:
       'Gruppenprojekt mit zwei Mitschülern über die Geschichte der Schweiz. Die Anwendung präsentiert Inhalte interaktiv und strukturiert in einer klaren Weboberfläche.',
@@ -48,6 +50,8 @@ export const projects = [
     url: 'https://sbb-lore.vercel.app/',
   },
   {
+    slug: 'java-would-you-rather',
+    layout: 'actual',
     title: 'Java WouldYouRather-Spiel',
     description:
       'Kleines Java-Projekt zur Übung von Logik, Struktur und sauberer Umsetzung einer interaktiven Spielidee.',
