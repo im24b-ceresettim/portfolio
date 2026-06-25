@@ -441,6 +441,9 @@ html.dark .page-section {
   height: 100%;
   min-height: min(26rem, 72vh);
   max-height: 72vh;
+  --carousel-clip-extension: calc(2.5rem + 0.75rem + 0.75rem);
+  --carousel-slide-gap: 1.25rem;
+  --carousel-enter-delay: 70ms;
 }
 
 .project-lightbox-carousel--single {
@@ -453,13 +456,115 @@ html.dark .page-section {
   height: 100%;
   min-height: min(26rem, 72vh);
   max-height: 72vh;
-  border-radius: 1rem;
+  --media-frame-radius: 1rem;
+  border-radius: var(--media-frame-radius);
   overflow: hidden;
+  isolation: isolate;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.project-lightbox-media-frame--transitioning {
+  overflow: visible;
+}
+
+.project-lightbox-media-clip {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * var(--carousel-clip-extension));
+  right: calc(-1 * var(--carousel-clip-extension));
+  overflow: hidden;
+}
+
+.project-lightbox-media-viewport {
+  position: relative;
+  width: calc(100% - 2 * var(--carousel-clip-extension));
+  height: 100%;
+  margin-inline: var(--carousel-clip-extension);
 }
 
 .project-lightbox-media-image {
   object-fit: cover;
+  z-index: 1;
+}
+
+.project-carousel-slide {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--media-frame-radius);
+  overflow: hidden;
+}
+
+.project-carousel-slide--leave-next {
+  z-index: 1;
+  animation: project-carousel-leave-next 0.5s ease-in-out forwards;
+}
+
+.project-carousel-slide--enter-next {
+  z-index: 1;
+  transform: translateX(calc(100% + var(--carousel-slide-gap)));
+  animation: project-carousel-enter-next 0.5s ease-in-out var(--carousel-enter-delay) forwards;
+}
+
+.project-carousel-slide--leave-prev {
+  z-index: 1;
+  animation: project-carousel-leave-prev 0.5s ease-in-out forwards;
+}
+
+.project-carousel-slide--enter-prev {
+  z-index: 1;
+  transform: translateX(calc(-100% - var(--carousel-slide-gap)));
+  animation: project-carousel-enter-prev 0.5s ease-in-out var(--carousel-enter-delay) forwards;
+}
+
+@keyframes project-carousel-leave-next {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--carousel-slide-gap)));
+  }
+}
+
+@keyframes project-carousel-enter-next {
+  from {
+    transform: translateX(calc(100% + var(--carousel-slide-gap)));
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes project-carousel-leave-prev {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(100% + var(--carousel-slide-gap)));
+  }
+}
+
+@keyframes project-carousel-enter-prev {
+  from {
+    transform: translateX(calc(-100% - var(--carousel-slide-gap)));
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-carousel-slide--leave-next,
+  .project-carousel-slide--enter-next,
+  .project-carousel-slide--leave-prev,
+  .project-carousel-slide--enter-prev {
+    animation-duration: 0.01ms;
+    animation-delay: 0ms;
+  }
 }
 
 .project-lightbox-media-placeholder {
@@ -498,7 +603,7 @@ html.dark .page-section {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 2;
+  z-index: 5;
 }
 
 .project-lightbox-carousel:not(.project-lightbox-carousel--single) .project-carousel-btn--prev {
@@ -511,6 +616,11 @@ html.dark .page-section {
 
 .project-carousel-btn:hover {
   background: rgba(0, 0, 0, 0.75);
+}
+
+.project-carousel-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .project-lightbox-panel {
@@ -562,12 +672,12 @@ html.lightbox-open body {
 
 html.lightbox-open nav,
 html.menu-open nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: auto;
-  z-index: 30;
+  pointer-events: none;
+}
+
+.nav-scroll-lock-spacer {
+  width: 100%;
+  flex-shrink: 0;
   pointer-events: none;
 }
 

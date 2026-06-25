@@ -1,6 +1,3 @@
-const getScrollbarWidth = () =>
-  window.innerWidth - document.documentElement.clientWidth;
-
 export const OVERLAY_SCROLL_GUARD_MS = 900;
 
 let overlayScrollGuardUntil = 0;
@@ -9,54 +6,73 @@ export function isOverlayScrollGuardActive() {
   return performance.now() < overlayScrollGuardUntil;
 }
 
+function armOverlayScrollGuard() {
+  overlayScrollGuardUntil = performance.now() + OVERLAY_SCROLL_GUARD_MS;
+}
+
 /**
- * Locks page scroll while preserving layout width when the scrollbar hides.
- * Returns an unlock function that restores scroll position and styles.
+ * Locks page scroll without shifting layout. Relies on scrollbar-gutter: stable
+ * on html so hiding overflow does not change page width.
+ *
+ * Sticky nav stops working when overflow is hidden, so we pin nav with
+ * position: fixed and insert a spacer to hold its in-flow height.
  */
 export function lockBodyScroll() {
   const scrollY = window.scrollY;
   const html = document.documentElement;
   const body = document.body;
   const nav = document.querySelector('nav');
-  const scrollbarWidth = getScrollbarWidth();
+
+  armOverlayScrollGuard();
 
   const snapshot = {
     scrollY,
     htmlOverflow: html.style.overflow,
     bodyOverflow: body.style.overflow,
-    bodyPosition: body.style.position,
-    bodyTop: body.style.top,
-    bodyLeft: body.style.left,
-    bodyRight: body.style.right,
-    bodyWidth: body.style.width,
-    bodyPaddingRight: body.style.paddingRight,
-    navPaddingRight: nav?.style.paddingRight ?? '',
+    navPosition: nav?.style.position ?? '',
+    navTop: nav?.style.top ?? '',
+    navLeft: nav?.style.left ?? '',
+    navRight: nav?.style.right ?? '',
+    navWidth: nav?.style.width ?? '',
+    navZIndex: nav?.style.zIndex ?? '',
   };
+
+  let navSpacer = null;
+
+  if (nav) {
+    const navHeight = nav.getBoundingClientRect().height;
+    navSpacer = document.createElement('div');
+    navSpacer.className = 'nav-scroll-lock-spacer';
+    navSpacer.style.height = `${navHeight}px`;
+    navSpacer.setAttribute('aria-hidden', 'true');
+    nav.parentNode?.insertBefore(navSpacer, nav);
+
+    nav.style.position = 'fixed';
+    nav.style.top = '0';
+    nav.style.left = '0';
+    nav.style.right = '0';
+    nav.style.width = 'auto';
+    nav.style.zIndex = '30';
+  }
 
   html.style.overflow = 'hidden';
   body.style.overflow = 'hidden';
-  body.style.position = 'fixed';
-  body.style.top = `-${scrollY}px`;
-  body.style.left = '0';
-  body.style.right = '0';
-  body.style.width = 'auto';
-
-  if (scrollbarWidth > 0) {
-    body.style.paddingRight = `${scrollbarWidth}px`;
-    if (nav) nav.style.paddingRight = `${scrollbarWidth}px`;
-  }
+  window.scrollTo(0, scrollY);
 
   return () => {
+    if (nav) {
+      nav.style.position = snapshot.navPosition;
+      nav.style.top = snapshot.navTop;
+      nav.style.left = snapshot.navLeft;
+      nav.style.right = snapshot.navRight;
+      nav.style.width = snapshot.navWidth;
+      nav.style.zIndex = snapshot.navZIndex;
+    }
+    navSpacer?.remove();
+
     html.style.overflow = snapshot.htmlOverflow;
     body.style.overflow = snapshot.bodyOverflow;
-    body.style.position = snapshot.bodyPosition;
-    body.style.top = snapshot.bodyTop;
-    body.style.left = snapshot.bodyLeft;
-    body.style.right = snapshot.bodyRight;
-    body.style.width = snapshot.bodyWidth;
-    body.style.paddingRight = snapshot.bodyPaddingRight;
-    if (nav) nav.style.paddingRight = snapshot.navPaddingRight;
     window.scrollTo(0, snapshot.scrollY);
-    overlayScrollGuardUntil = performance.now() + OVERLAY_SCROLL_GUARD_MS;
+    armOverlayScrollGuard();
   };
 }
