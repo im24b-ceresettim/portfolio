@@ -254,6 +254,7 @@ html.dark .ios-switch-track::after {
   .ios-switch-track::after,
   .lightbox-backdrop,
   .profile-lightbox-image,
+  .project-focus-image,
   .project-lightbox-panel,
   .project-lightbox-layout,
   .project-lightbox-media-image {
@@ -403,7 +404,95 @@ html.dark .page-section {
   justify-content: center;
 }
 
+.lightbox-backdrop--focus {
+  z-index: 80;
+  transition: opacity 0.2s ease;
+}
+
+.lightbox-backdrop--focus.is-active {
+  background: transparent;
+}
+
+.lightbox-backdrop--focus.is-closing {
+  pointer-events: auto;
+}
+
+.lightbox-backdrop,
+.project-lightbox-layout,
+.project-lightbox-media,
+.project-lightbox-panel-wrap,
+.project-lightbox-panel,
+.project-focus-dialog,
+.profile-lightbox-dialog {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.project-lightbox-panel .project-content h3,
+.project-lightbox-panel .project-content .project-desc,
+.project-lightbox-panel .project-content a {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.project-focus-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(92vw, 1400px);
+  height: min(92vh, 92dvh);
+  flex-shrink: 0;
+  position: relative;
+  pointer-events: none;
+}
+
+.project-focus-image {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.lightbox-backdrop--focus.is-active .project-focus-image {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.lightbox-backdrop--focus.is-active .project-lightbox-panel--centered {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.project-lightbox-media--focusable {
+  cursor: zoom-in;
+  outline: none;
+}
+
+.project-lightbox-media--focusable:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline-offset: 4px;
+  border-radius: 1rem;
+}
+
+.project-lightbox-panel-wrap--focusable {
+  cursor: pointer;
+  outline: none;
+}
+
+.project-lightbox-panel-wrap--focusable:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline-offset: 4px;
+  border-radius: 1rem;
+}
+
 .project-lightbox-layout {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
@@ -679,6 +768,13 @@ html.dark .page-section {
   opacity: 0;
   transform: scale(0.96);
   transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.lightbox-backdrop--focus .project-lightbox-panel--centered {
+  width: min(90vw, 640px);
+  max-width: min(90vw, 640px);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 html.dark .project-lightbox-panel {

@@ -109,6 +109,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
     lastY: 0,
     moved: false,
   });
+  const gestureMovedRef = useRef(false);
 
   const [layoutBySrc, setLayoutBySrc] = useState({});
   const [viewState, setViewState] = useState(DEFAULT_IMAGE_VIEW);
@@ -200,6 +201,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
       lastY: 0,
       moved: false,
     };
+    gestureMovedRef.current = false;
     setLayoutBySrc({});
     setViewState(DEFAULT_IMAGE_VIEW);
     viewStateRef.current = DEFAULT_IMAGE_VIEW;
@@ -207,6 +209,12 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
     setIsPinching(false);
     setIsInteractive(false);
   }, [isOpen]);
+
+  const consumeGestureMoved = useCallback(() => {
+    const moved = gestureMovedRef.current;
+    gestureMovedRef.current = false;
+    return moved;
+  }, []);
 
   const resetView = useCallback(() => {
     setViewState(DEFAULT_IMAGE_VIEW);
@@ -305,6 +313,8 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
       const baseLayout = getBaseLayout(activeSrc);
       if (!baseLayout) return;
 
+      gestureMovedRef.current = false;
+
       activePointersRef.current.set(event.pointerId, {
         x: event.clientX,
         y: event.clientY,
@@ -323,6 +333,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
           startZoom: viewStateRef.current.zoom,
         };
         setIsPinching(true);
+        gestureMovedRef.current = true;
         return;
       }
 
@@ -363,6 +374,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
 
       if (pinchRef.current.active && activePointersRef.current.size >= 2) {
         event.preventDefault();
+        gestureMovedRef.current = true;
 
         const [first, second] = getPinchPoints();
         const distance = getPointerDistance(first, second);
@@ -391,6 +403,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
       if (!drag.moved) {
         if (Math.hypot(dx, dy) < PAN_DRAG_THRESHOLD_PX) return;
         drag.moved = true;
+        gestureMovedRef.current = true;
         setIsPanning(true);
       }
 
@@ -439,6 +452,7 @@ export function useImagePan({ isOpen, isTransitioning, activeSrc }) {
     getActiveDisplayLayout,
     registerImage,
     resetView,
+    consumeGestureMoved,
     frameViewHandlers: {
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,

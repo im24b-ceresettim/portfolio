@@ -1,8 +1,10 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLightbox } from '../hooks/useLightbox';
+import { usePanelPointerTap } from '../hooks/usePanelPointerTap';
 import { getProjectLightboxMode } from '../utils/projectLightboxMode';
+import ProjectFocusOverlay from './ProjectFocusOverlay';
 import ProjectImageCarousel from './ProjectImageCarousel';
 
 function GithubIcon() {
@@ -43,7 +45,7 @@ function LiveIcon() {
   );
 }
 
-function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSurface }) {
+export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSurface }) {
   const handleLinkClick = useCallback(
     (event) => {
       if (!onCardSurface) return;
@@ -106,6 +108,7 @@ function ProjectLightboxPanel({ project, hasGh, hasUrl, techTags }) {
         hasGh={hasGh}
         hasUrl={hasUrl}
         techTags={techTags}
+        onCardSurface
       />
     </div>
   );
@@ -115,6 +118,11 @@ export default function ProjectCard({ project, images = [] }) {
   const { isOpen, isActive, handleOpen, handleClose, handleTriggerKeyDown } =
     useLightbox();
 
+  const [focusMode, setFocusMode] = useState(null);
+  const [focusOpen, setFocusOpen] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [carouselTransitioning, setCarouselTransitioning] = useState(false);
+
   const hasGh = project.gh && project.gh !== '#';
   const hasUrl = project.url && project.url !== '#';
   const techTags = project.stack
@@ -123,6 +131,110 @@ export default function ProjectCard({ project, images = [] }) {
   const lightboxMode = getProjectLightboxMode(images.length);
   const usesImageLayout = lightboxMode !== 'standard';
   const showCarouselArrows = lightboxMode === 'multipicture';
+  const focusImageSrc = images[carouselIndex];
+
+  const openFocus = useCallback((mode) => {
+    setFocusMode(mode);
+    setFocusOpen(true);
+  }, []);
+
+  const closeFocus = useCallback(() => {
+    setFocusOpen(false);
+  }, []);
+
+  const clearFocusMode = useCallback(() => {
+    setFocusMode(null);
+  }, []);
+
+  const consumeGestureMovedRef = useRef(() => false);
+
+  const openCardFocus = useCallback(() => {
+    openFocus('card');
+  }, [openFocus]);
+
+  const {
+    handlePanelPointerDown,
+    handlePanelPointerMove,
+    handlePanelPointerUp: handlePanelFocusPointerUp,
+    handlePanelPointerCancel,
+    resetPanelPointer,
+  } = usePanelPointerTap(openCardFocus);
+
+  const handleMediaFocusPointerUp = useCallback(
+    (event) => {
+      if (event.button !== 0) return;
+      if (event.target.closest('.project-carousel-btn')) return;
+      event.stopPropagation();
+      if (carouselTransitioning) return;
+      if (consumeGestureMovedRef.current()) return;
+      openFocus('image');
+    },
+    [carouselTransitioning, openFocus]
+  );
+
+  const handleMediaFocusKeyDown = useCallback(
+    (event) => {
+      if (carouselTransitioning) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.stopPropagation();
+        openFocus('image');
+      }
+    },
+    [carouselTransitioning, openFocus]
+  );
+
+  const handlePanelFocusKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.stopPropagation();
+        openFocus('card');
+      }
+    },
+    [openFocus]
+  );
+
+  const handleProjectBackdropClick = useCallback(
+    (event) => {
+      if (focusMode !== null) {
+        event.stopPropagation();
+        return;
+      }
+      handleClose();
+    },
+    [focusMode, handleClose]
+  );
+
+  const stopBackdropClick = useCallback((event) => {
+    event.stopPropagation();
+  }, []);
+
+  const preventDoubleClickSelect = useCallback((event) => {
+    event.preventDefault();
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) return;
+    setFocusMode(null);
+    setFocusOpen(false);
+    setCarouselIndex(0);
+    setCarouselTransitioning(false);
+    resetPanelPointer();
+  }, [isOpen, resetPanelPointer]);
+
+  useEffect(() => {
+    if (!focusOpen) return;
+
+    const handleEscape = (event) => {
+      if (event.key !== 'Escape') return;
+      event.stopImmediatePropagation();
+      closeFocus();
+    };
+
+    window.addEventListener('keydown', handleEscape, true);
+    return () => window.removeEventListener('keydown', handleEscape, true);
+  }, [focusOpen, closeFocus]);
 
   return (
     <>
@@ -148,7 +260,8 @@ export default function ProjectCard({ project, images = [] }) {
           className={`lightbox-backdrop ${isActive ? 'is-active' : ''}${
             usesImageLayout ? ' lightbox-backdrop--project-wide' : ''
           }`}
-          onClick={handleClose}
+          onClick={handleProjectBackdropClick}
+          onDoubleClick={preventDoubleClickSelect}
           role="presentation"
         >
           {usesImageLayout ? (
@@ -157,19 +270,40 @@ export default function ProjectCard({ project, images = [] }) {
               role="dialog"
               aria-modal="true"
               aria-label={project.title}
+              onClick={stopBackdropClick}
+              onDoubleClick={preventDoubleClickSelect}
             >
               <div
-                className="project-lightbox-media"
-                onClick={(event) => event.stopPropagation()}
+                className="project-lightbox-media project-lightbox-media--focusable"
+                role="button"
+                tabIndex={0}
+                aria-label={`${project.title} — Bild vergrössern`}
+                onClick={stopBackdropClick}
+                onPointerUp={handleMediaFocusPointerUp}
+                onKeyDown={handleMediaFocusKeyDown}
               >
                 <ProjectImageCarousel
                   images={images}
                   title={project.title}
                   showArrows={showCarouselArrows}
                   isOpen={isOpen}
+                  onIndexChange={setCarouselIndex}
+                  onTransitionChange={setCarouselTransitioning}
+                  consumeGestureMovedRef={consumeGestureMovedRef}
                 />
               </div>
-              <div onClick={(event) => event.stopPropagation()}>
+              <div
+                className="project-lightbox-panel-wrap project-lightbox-panel-wrap--focusable"
+                role="button"
+                tabIndex={0}
+                aria-label={`${project.title} — Karte vergrössern`}
+                onClick={stopBackdropClick}
+                onPointerDown={handlePanelPointerDown}
+                onPointerMove={handlePanelPointerMove}
+                onPointerUp={handlePanelFocusPointerUp}
+                onPointerCancel={handlePanelPointerCancel}
+                onKeyDown={handlePanelFocusKeyDown}
+              >
                 <ProjectLightboxPanel
                   project={project}
                   hasGh={hasGh}
@@ -193,6 +327,27 @@ export default function ProjectCard({ project, images = [] }) {
                 techTags={techTags}
               />
             </div>
+          )}
+
+          {usesImageLayout && focusMode && focusImageSrc && (
+            <ProjectFocusOverlay
+              mode={focusMode}
+              isOpen={focusOpen}
+              onClose={closeFocus}
+              onExited={clearFocusMode}
+              imageSrc={focusImageSrc}
+              imageAlt={`${project.title} — Bild ${carouselIndex + 1} von ${images.length}`}
+              cardLabel={project.title}
+              cardContent={
+                <ProjectCardContent
+                  project={project}
+                  hasGh={hasGh}
+                  hasUrl={hasUrl}
+                  techTags={techTags}
+                  onCardSurface
+                />
+              }
+            />
           )}
         </div>
       )}

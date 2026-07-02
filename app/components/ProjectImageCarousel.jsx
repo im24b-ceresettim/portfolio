@@ -33,6 +33,9 @@ export default function ProjectImageCarousel({
   title,
   showArrows = true,
   isOpen = false,
+  onIndexChange,
+  onTransitionChange,
+  consumeGestureMovedRef,
 }) {
   const [index, setIndex] = useState(0);
   const [leavingIndex, setLeavingIndex] = useState(null);
@@ -55,6 +58,7 @@ export default function ProjectImageCarousel({
     getActiveDisplayLayout,
     registerImage,
     resetView,
+    consumeGestureMoved,
     frameViewHandlers,
   } = useImagePan({
     isOpen,
@@ -74,8 +78,22 @@ export default function ProjectImageCarousel({
       setIndex(0);
       setLeavingIndex(null);
       isAnimatingRef.current = false;
+      onIndexChange?.(0);
     }
-  }, [isOpen]);
+  }, [isOpen, onIndexChange]);
+
+  useEffect(() => {
+    onIndexChange?.(index);
+  }, [index, onIndexChange]);
+
+  useEffect(() => {
+    onTransitionChange?.(isTransitioning);
+  }, [isTransitioning, onTransitionChange]);
+
+  useEffect(() => {
+    if (!consumeGestureMovedRef) return;
+    consumeGestureMovedRef.current = consumeGestureMoved;
+  }, [consumeGestureMoved, consumeGestureMovedRef]);
 
   const navigate = useCallback(
     (dir) => {
@@ -107,8 +125,20 @@ export default function ProjectImageCarousel({
     return () => window.clearTimeout(timer);
   }, [leavingIndex, index, resetView]);
 
-  const goPrev = useCallback(() => navigate(-1), [navigate]);
-  const goNext = useCallback(() => navigate(1), [navigate]);
+  const goPrev = useCallback(
+    (event) => {
+      event?.stopPropagation?.();
+      navigate(-1);
+    },
+    [navigate]
+  );
+  const goNext = useCallback(
+    (event) => {
+      event?.stopPropagation?.();
+      navigate(1);
+    },
+    [navigate]
+  );
 
   useEffect(() => {
     if (!isOpen || !arrowsVisible) return;

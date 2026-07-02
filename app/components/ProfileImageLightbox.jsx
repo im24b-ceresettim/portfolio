@@ -30,6 +30,7 @@ export default function ProfileImageLightbox({ src, alt }) {
         <div
           className={`lightbox-backdrop ${isActive ? 'is-active' : ''}`}
           onClick={handleClose}
+          onDoubleClick={(event) => event.preventDefault()}
           role="presentation"
         >
           <div
