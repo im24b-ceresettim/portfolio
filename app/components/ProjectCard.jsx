@@ -197,13 +197,13 @@ export default function ProjectCard({ project, images = [] }) {
 
   const handleProjectBackdropClick = useCallback(
     (event) => {
-      if (focusMode !== null) {
+      if (focusOpen) {
         event.stopPropagation();
         return;
       }
       handleClose();
     },
-    [focusMode, handleClose]
+    [focusOpen, handleClose]
   );
 
   const stopBackdropClick = useCallback((event) => {

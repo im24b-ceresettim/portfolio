@@ -154,7 +154,12 @@ html.dark .nav-drawer-links .nav-link {
   align-items: center;
   justify-content: flex-start;
   padding: 1rem 1.25rem;
+  border-top: 1px dashed black;
   flex-shrink: 0;
+}
+
+html.dark .nav-drawer-theme {
+  border-color: white;
 }
 
 .nav-drawer-theme-controls {
@@ -414,7 +419,7 @@ html.dark .page-section {
 }
 
 .lightbox-backdrop--focus.is-closing {
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .lightbox-backdrop,
@@ -481,8 +486,12 @@ html.dark .page-section {
 }
 
 .project-lightbox-panel-wrap--focusable {
-  cursor: pointer;
+  cursor: default;
   outline: none;
+}
+
+.project-lightbox-panel-wrap--focusable .project-btn {
+  cursor: pointer;
 }
 
 .project-lightbox-panel-wrap--focusable:focus-visible {
@@ -985,6 +994,11 @@ html.dark .tech-tag {
   .nav-drawer-backdrop,
   .nav-drawer {
     display: flex;
+  }
+
+  html.menu-open .nav-drawer-backdrop.is-open,
+  html.menu-open .nav-drawer.is-open {
+    pointer-events: auto;
   }
 
   .nav-drawer-theme {
