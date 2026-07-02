@@ -35,10 +35,11 @@ export function useLightbox() {
 
   const handleClose = useCallback(() => {
     setIsActive(false);
+    releaseScrollLock();
     window.setTimeout(() => {
       setIsOpen(false);
     }, LIGHTBOX_TRANSITION_MS);
-  }, []);
+  }, [releaseScrollLock]);
 
   const handleTriggerKeyDown = useCallback(
     (event) => {

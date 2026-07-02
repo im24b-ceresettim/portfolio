@@ -7,9 +7,8 @@ const SATURN_R = 1.8;
 const RING_INNER_R = 2.0;
 const RING_OUTER_R = 4.5;
 const STAR_COUNT = 4000;
-const SHOOTING_STAR_SPAWN_MIN_S = 8;
-const SHOOTING_STAR_SPAWN_MAX_S = 15;
-const SHOOTING_STAR_DARK_THRESHOLD = 0.85;
+const SHOOTING_STAR_SPAWN_INTERVAL_S = 7;
+const SHOOTING_STAR_DARK_THRESHOLD = 0.5;
 
 const THEMES = {
   dark: {
@@ -199,28 +198,30 @@ function createStarField() {
 }
 
 function spawnShootingStar(scene, camera) {
-  const length = 20 + Math.random() * 15;
-  const speed = 80 + Math.random() * 40;
+  const length = 22 + Math.random() * 18;
+  const speed = 85 + Math.random() * 35;
+
+  camera.updateMatrixWorld();
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
 
   const right = new THREE.Vector3();
   const up = new THREE.Vector3();
-  camera.matrixWorld.extractBasis(right, up, new THREE.Vector3());
-  right.y *= 0.35;
-  up.y *= 0.2;
+  camera.matrixWorld.extractBasis(right, up, forward.clone().negate());
 
+  const across = Math.random() < 0.5 ? -1 : 1;
   const direction = new THREE.Vector3()
-    .addScaledVector(right, Math.random() - 0.5)
-    .addScaledVector(up, (Math.random() - 0.5) * 0.35)
+    .addScaledVector(right, across * (0.55 + Math.random() * 0.35))
+    .addScaledVector(up, -0.25 - Math.random() * 0.35)
+    .addScaledVector(forward, -0.08 - Math.random() * 0.12)
     .normalize();
 
-  const theta = Math.random() * Math.PI * 2;
-  const phi = Math.acos(2 * Math.random() - 1);
-  const radius = 70 + Math.random() * 30;
-  const head = new THREE.Vector3(
-    radius * Math.sin(phi) * Math.cos(theta),
-    radius * Math.sin(phi) * Math.sin(theta),
-    radius * Math.cos(phi),
-  );
+  const dist = 75 + Math.random() * 35;
+  const head = new THREE.Vector3()
+    .copy(camera.position)
+    .addScaledVector(forward, dist)
+    .addScaledVector(right, across * (18 + Math.random() * 22))
+    .addScaledVector(up, 8 + Math.random() * 16);
   const tail = head.clone().addScaledVector(direction, -length);
 
   const positions = new Float32Array([
@@ -301,11 +302,11 @@ function updateShootingStars(scene, meteors, dt) {
   return active;
 }
 
-function scheduleNextShootingStar(elapsed) {
+function canSpawnShootingStars(prefersReducedMotion, darkMode, progress) {
   return (
-    elapsed +
-    SHOOTING_STAR_SPAWN_MIN_S +
-    Math.random() * (SHOOTING_STAR_SPAWN_MAX_S - SHOOTING_STAR_SPAWN_MIN_S)
+    !prefersReducedMotion &&
+    darkMode &&
+    progress > SHOOTING_STAR_DARK_THRESHOLD
   );
 }
 
@@ -414,7 +415,8 @@ export default function UniverseBackground({ darkMode }) {
       '(prefers-reduced-motion: reduce)',
     ).matches;
     let shootingStars = [];
-    let nextShootingStarAt = scheduleNextShootingStar(clock.getElapsedTime());
+    let nextShootingStarAt =
+      clock.getElapsedTime() + SHOOTING_STAR_SPAWN_INTERVAL_S;
 
     const animate = () => {
       frameId = requestAnimationFrame(animate);
@@ -423,7 +425,7 @@ export default function UniverseBackground({ darkMode }) {
 
       saturn.rotation.y -= dt * 0.05;
       ring.rotation.z -= dt * 0.05;
-      stars.rotation.y += dt * 0.002;
+      stars.rotation.y -= dt * 0.002;
 
       camera.position.x +=
         (BASE_CAM.x + targetX * 0.6 - camera.position.x) * 0.02;
@@ -445,17 +447,14 @@ export default function UniverseBackground({ darkMode }) {
         renderer.toneMappingExposure = lerp(l.exposure, d.exposure, progress);
       }
 
-      if (
-        !prefersReducedMotion &&
-        progress > SHOOTING_STAR_DARK_THRESHOLD &&
-        shootingStars.length === 0 &&
-        elapsed >= nextShootingStarAt
-      ) {
-        shootingStars.push(spawnShootingStar(scene, camera));
-        nextShootingStarAt = scheduleNextShootingStar(elapsed);
-      }
-
       shootingStars = updateShootingStars(scene, shootingStars, dt);
+
+      if (elapsed >= nextShootingStarAt) {
+        if (canSpawnShootingStars(prefersReducedMotion, darkModeRef.current, progress)) {
+          shootingStars.push(spawnShootingStar(scene, camera));
+        }
+        nextShootingStarAt = elapsed + SHOOTING_STAR_SPAWN_INTERVAL_S;
+      }
 
       renderer.render(scene, camera);
     };

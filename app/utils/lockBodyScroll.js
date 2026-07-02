@@ -1,4 +1,5 @@
 export const OVERLAY_SCROLL_GUARD_MS = 900;
+export const OVERLAY_UNLOCK_GUARD_MS = 150;
 
 let overlayScrollGuardUntil = 0;
 
@@ -6,8 +7,8 @@ export function isOverlayScrollGuardActive() {
   return performance.now() < overlayScrollGuardUntil;
 }
 
-function armOverlayScrollGuard() {
-  overlayScrollGuardUntil = performance.now() + OVERLAY_SCROLL_GUARD_MS;
+function armOverlayScrollGuard(duration = OVERLAY_SCROLL_GUARD_MS) {
+  overlayScrollGuardUntil = performance.now() + duration;
 }
 
 /**
@@ -73,6 +74,6 @@ export function lockBodyScroll() {
     html.style.overflow = snapshot.htmlOverflow;
     body.style.overflow = snapshot.bodyOverflow;
     window.scrollTo(0, snapshot.scrollY);
-    armOverlayScrollGuard();
+    armOverlayScrollGuard(OVERLAY_UNLOCK_GUARD_MS);
   };
 }
