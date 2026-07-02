@@ -1,7 +1,12 @@
 'use client';
 
-import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  DEFAULT_IMAGE_VIEW,
+  getDisplayLayout,
+  useImagePan,
+} from '../hooks/useImagePan';
+import PannableProjectImage from './PannableProjectImage';
 
 const CAROUSEL_TRANSITION_MS = 500;
 const CAROUSEL_ENTER_DELAY_MS = 70;
@@ -31,6 +36,7 @@ export default function ProjectImageCarousel({
 }) {
   const [index, setIndex] = useState(0);
   const [leavingIndex, setLeavingIndex] = useState(null);
+  const [leavingViewSnapshot, setLeavingViewSnapshot] = useState(DEFAULT_IMAGE_VIEW);
   const [direction, setDirection] = useState(1);
   const isAnimatingRef = useRef(false);
 
@@ -38,6 +44,30 @@ export default function ProjectImageCarousel({
   const arrowsVisible = showArrows && images.length > 1;
   const isTransitioning = leavingIndex !== null;
   const directionClass = direction === 1 ? 'next' : 'prev';
+
+  const {
+    frameRef,
+    viewState,
+    isPanning,
+    isPinching,
+    isInteractive,
+    getImageLayout,
+    getActiveDisplayLayout,
+    registerImage,
+    resetView,
+    frameViewHandlers,
+  } = useImagePan({
+    isOpen,
+    isTransitioning,
+    activeSrc: currentImage,
+  });
+
+  const handleImageLoad = useCallback(
+    (src, naturalWidth, naturalHeight) => {
+      registerImage(src, naturalWidth, naturalHeight);
+    },
+    [registerImage]
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -57,11 +87,12 @@ export default function ProjectImageCarousel({
           : (index - 1 + images.length) % images.length;
 
       isAnimatingRef.current = true;
+      setLeavingViewSnapshot(viewState);
       setDirection(dir);
       setLeavingIndex(index);
       setIndex(nextIndex);
     },
-    [index, images.length]
+    [index, images.length, viewState]
   );
 
   useEffect(() => {
@@ -70,10 +101,11 @@ export default function ProjectImageCarousel({
     const timer = window.setTimeout(() => {
       setLeavingIndex(null);
       isAnimatingRef.current = false;
+      resetView();
     }, CAROUSEL_TOTAL_MS);
 
     return () => window.clearTimeout(timer);
-  }, [leavingIndex, index]);
+  }, [leavingIndex, index, resetView]);
 
   const goPrev = useCallback(() => navigate(-1), [navigate]);
   const goNext = useCallback(() => navigate(1), [navigate]);
@@ -105,6 +137,19 @@ export default function ProjectImageCarousel({
   }
 
   const leavingImage = leavingIndex !== null ? images[leavingIndex] : null;
+  const activeDisplayLayout = getActiveDisplayLayout();
+  const defaultTransitionLayout = (src) =>
+    getDisplayLayout(getImageLayout(src), DEFAULT_IMAGE_VIEW.zoom);
+
+  const frameClassName = [
+    'project-lightbox-media-frame',
+    isTransitioning ? 'project-lightbox-media-frame--transitioning' : '',
+    !isTransitioning && isInteractive ? 'project-lightbox-media-frame--pannable' : '',
+    isPanning ? 'is-panning' : '',
+    isPinching ? 'is-pinching' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div
@@ -125,9 +170,9 @@ export default function ProjectImageCarousel({
       )}
 
       <div
-        className={`project-lightbox-media-frame${
-          isTransitioning ? ' project-lightbox-media-frame--transitioning' : ''
-        }`}
+        ref={frameRef}
+        className={frameClassName}
+        {...(!isTransitioning ? frameViewHandlers : {})}
       >
         {isTransitioning && leavingImage ? (
           <div className="project-lightbox-media-clip">
@@ -135,35 +180,37 @@ export default function ProjectImageCarousel({
               <div
                 className={`project-carousel-slide project-carousel-slide--leave project-carousel-slide--leave-${directionClass}`}
               >
-                <Image
-                  className="project-lightbox-media-image"
+                <PannableProjectImage
                   src={leavingImage}
-                  alt=""
-                  fill
-                  sizes="42vw"
-                  aria-hidden="true"
+                  displayLayout={getDisplayLayout(
+                    getImageLayout(leavingImage),
+                    leavingViewSnapshot.zoom
+                  )}
+                  panOffset={leavingViewSnapshot}
+                  onImageLoad={handleImageLoad}
+                  ariaHidden
                 />
               </div>
               <div
                 className={`project-carousel-slide project-carousel-slide--enter project-carousel-slide--enter-${directionClass}`}
               >
-                <Image
-                  className="project-lightbox-media-image"
+                <PannableProjectImage
                   src={currentImage}
                   alt={`${title} — Bild ${index + 1} von ${images.length}`}
-                  fill
-                  sizes="42vw"
+                  displayLayout={defaultTransitionLayout(currentImage)}
+                  panOffset={DEFAULT_IMAGE_VIEW}
+                  onImageLoad={handleImageLoad}
                 />
               </div>
             </div>
           </div>
         ) : (
-          <Image
-            className="project-lightbox-media-image"
+          <PannableProjectImage
             src={currentImage}
             alt={`${title} — Bild ${index + 1} von ${images.length}`}
-            fill
-            sizes="42vw"
+            displayLayout={activeDisplayLayout}
+            panOffset={viewState}
+            onImageLoad={handleImageLoad}
             priority
           />
         )}

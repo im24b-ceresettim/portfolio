@@ -467,6 +467,21 @@ html.dark .page-section {
   overflow: visible;
 }
 
+.project-lightbox-media-frame--pannable {
+  cursor: grab;
+  touch-action: none;
+}
+
+.project-lightbox-media-frame--pannable.is-panning {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.project-lightbox-media-frame--pannable.is-pinching {
+  cursor: grabbing;
+  user-select: none;
+}
+
 .project-lightbox-media-clip {
   position: absolute;
   top: 0;
@@ -486,6 +501,22 @@ html.dark .page-section {
 .project-lightbox-media-image {
   object-fit: cover;
   z-index: 1;
+}
+
+.project-carousel-pan-layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  will-change: transform;
+}
+
+.project-carousel-pan-layer .project-lightbox-media-image {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  object-fit: fill;
 }
 
 .project-carousel-slide {
