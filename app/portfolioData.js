@@ -40,6 +40,24 @@ export const portfolioData = {
 
 export const projects = [
   {
+    slug: 'Duck-Drift',
+    title: 'Duck Drift',
+    description:
+      'Für das zweite Hackathon entwickelte Projekt, welches die Motion-sensors des Handy benutzt, um ein damit gesteuertes Autospiel zu erstellem^n.',
+    stack: 'Express.js, Websocket, Redis, Deplo.io, Python, JavaScript, HTML, CSS',
+    gh: 'https://github.com/Lorenzo-Se/duck-drift',
+    url: 'https://server.b206b21.deploio.app/',
+  },
+  {
+    slug: 'Planetensystem',
+    title: 'Planetensystem',
+    description:
+      'Interaktive Darstellung eines Planetensystems mit Fokus auf Visualisierung und Struktur.',
+    stack: 'TypeScript, Three.js, React, HTML, CSS,',
+    gh: 'https://github.com/im24b-ceresettim/Planetensystem',
+    url: '#'
+  },
+  {
     slug: 'sbb-lore',
     title: 'SBB-Lore',
     description:

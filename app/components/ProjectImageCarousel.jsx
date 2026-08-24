@@ -6,11 +6,8 @@ import {
   getDisplayLayout,
   useImagePan,
 } from '../hooks/useImagePan';
+import { useSlideCarousel } from '../hooks/useSlideCarousel';
 import PannableProjectImage from './PannableProjectImage';
-
-const CAROUSEL_TRANSITION_MS = 500;
-const CAROUSEL_ENTER_DELAY_MS = 70;
-const CAROUSEL_TOTAL_MS = CAROUSEL_TRANSITION_MS + CAROUSEL_ENTER_DELAY_MS;
 
 function ChevronLeft() {
   return (
@@ -37,15 +34,37 @@ export default function ProjectImageCarousel({
   onTransitionChange,
   consumeGestureMovedRef,
 }) {
-  const [index, setIndex] = useState(0);
-  const [leavingIndex, setLeavingIndex] = useState(null);
   const [leavingViewSnapshot, setLeavingViewSnapshot] = useState(DEFAULT_IMAGE_VIEW);
-  const [direction, setDirection] = useState(1);
-  const isAnimatingRef = useRef(false);
+  const viewStateRef = useRef(DEFAULT_IMAGE_VIEW);
+  const resetViewRef = useRef(null);
+
+  const handleNavigateStart = useCallback(() => {
+    setLeavingViewSnapshot(viewStateRef.current);
+  }, []);
+
+  const handleTransitionEnd = useCallback(() => {
+    resetViewRef.current?.();
+  }, []);
+
+  const {
+    pageIndex: index,
+    leavingPageIndex: leavingIndex,
+    direction,
+    isTransitioning,
+    canNavigate,
+    goPrev,
+    goNext,
+  } = useSlideCarousel({
+    totalItems: images.length,
+    itemsPerPage: 1,
+    onPageChange: onIndexChange,
+    resetKey: isOpen ? 'open' : 'closed',
+    onNavigateStart: handleNavigateStart,
+    onTransitionEnd: handleTransitionEnd,
+  });
 
   const currentImage = images[index];
-  const arrowsVisible = showArrows && images.length > 1;
-  const isTransitioning = leavingIndex !== null;
+  const arrowsVisible = showArrows && canNavigate;
   const directionClass = direction === 1 ? 'next' : 'prev';
 
   const {
@@ -66,25 +85,20 @@ export default function ProjectImageCarousel({
     activeSrc: currentImage,
   });
 
+  useEffect(() => {
+    viewStateRef.current = viewState;
+  }, [viewState]);
+
+  useEffect(() => {
+    resetViewRef.current = resetView;
+  }, [resetView]);
+
   const handleImageLoad = useCallback(
     (src, naturalWidth, naturalHeight) => {
       registerImage(src, naturalWidth, naturalHeight);
     },
     [registerImage]
   );
-
-  useEffect(() => {
-    if (!isOpen) {
-      setIndex(0);
-      setLeavingIndex(null);
-      isAnimatingRef.current = false;
-      onIndexChange?.(0);
-    }
-  }, [isOpen, onIndexChange]);
-
-  useEffect(() => {
-    onIndexChange?.(index);
-  }, [index, onIndexChange]);
 
   useEffect(() => {
     onTransitionChange?.(isTransitioning);
@@ -94,51 +108,6 @@ export default function ProjectImageCarousel({
     if (!consumeGestureMovedRef) return;
     consumeGestureMovedRef.current = consumeGestureMoved;
   }, [consumeGestureMoved, consumeGestureMovedRef]);
-
-  const navigate = useCallback(
-    (dir) => {
-      if (isAnimatingRef.current || images.length <= 1) return;
-
-      const nextIndex =
-        dir === 1
-          ? (index + 1) % images.length
-          : (index - 1 + images.length) % images.length;
-
-      isAnimatingRef.current = true;
-      setLeavingViewSnapshot(viewState);
-      setDirection(dir);
-      setLeavingIndex(index);
-      setIndex(nextIndex);
-    },
-    [index, images.length, viewState]
-  );
-
-  useEffect(() => {
-    if (leavingIndex === null) return;
-
-    const timer = window.setTimeout(() => {
-      setLeavingIndex(null);
-      isAnimatingRef.current = false;
-      resetView();
-    }, CAROUSEL_TOTAL_MS);
-
-    return () => window.clearTimeout(timer);
-  }, [leavingIndex, index, resetView]);
-
-  const goPrev = useCallback(
-    (event) => {
-      event?.stopPropagation?.();
-      navigate(-1);
-    },
-    [navigate]
-  );
-  const goNext = useCallback(
-    (event) => {
-      event?.stopPropagation?.();
-      navigate(1);
-    },
-    [navigate]
-  );
 
   useEffect(() => {
     if (!isOpen || !arrowsVisible) return;

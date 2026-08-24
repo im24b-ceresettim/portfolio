@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { unstable_noStore as noStore } from 'next/cache';
 import ProfileImageLightbox from './components/ProfileImageLightbox';
-import ProjectCard from './components/ProjectCard';
+import ProjectsCarousel from './components/ProjectsCarousel';
 import { portfolioData, projects } from './portfolioData';
 import { getProjectImages } from './utils/getProjectImages';
 
@@ -28,15 +28,12 @@ export default function Home() {
       <section id="projects" className="page-section">
         <div className="section-inner">
           <p className="section-tag">Projects</p>
-          <div className="project-grid">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.slug}
-                project={project}
-                images={getProjectImages(project.slug)}
-              />
-            ))}
-          </div>
+          <ProjectsCarousel
+            items={projects.map((project) => ({
+              project,
+              images: getProjectImages(project.slug),
+            }))}
+          />
         </div>
       </section>
 

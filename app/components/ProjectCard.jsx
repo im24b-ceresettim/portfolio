@@ -45,7 +45,15 @@ function LiveIcon() {
   );
 }
 
-export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSurface }) {
+export function ProjectCardContent({
+  project,
+  hasGh,
+  hasUrl,
+  isGhPlaceholder,
+  isUrlPlaceholder,
+  techTags,
+  onCardSurface,
+}) {
   const handleLinkClick = useCallback(
     (event) => {
       if (!onCardSurface) return;
@@ -53,6 +61,11 @@ export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSur
     },
     [onCardSurface]
   );
+
+  const handlePlaceholderClick = useCallback((event) => {
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
 
   return (
     <>
@@ -72,11 +85,14 @@ export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSur
         <div className="project-actions">
           {hasGh && (
             <a
-              href={project.gh}
-              target="_blank"
-              rel="noreferrer"
-              className="project-btn github-btn"
-              onClick={handleLinkClick}
+              href={isGhPlaceholder ? '#' : project.gh}
+              target={isGhPlaceholder ? undefined : '_blank'}
+              rel={isGhPlaceholder ? undefined : 'noreferrer'}
+              className={`project-btn github-btn${
+                isGhPlaceholder ? ' project-btn--placeholder' : ''
+              }`}
+              aria-disabled={isGhPlaceholder ? 'true' : undefined}
+              onClick={isGhPlaceholder ? handlePlaceholderClick : handleLinkClick}
             >
               <GithubIcon />
               Github
@@ -84,11 +100,14 @@ export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSur
           )}
           {hasUrl && (
             <a
-              href={project.url}
-              target="_blank"
-              rel="noreferrer"
-              className="project-btn live-btn"
-              onClick={handleLinkClick}
+              href={isUrlPlaceholder ? '#' : project.url}
+              target={isUrlPlaceholder ? undefined : '_blank'}
+              rel={isUrlPlaceholder ? undefined : 'noreferrer'}
+              className={`project-btn live-btn${
+                isUrlPlaceholder ? ' project-btn--placeholder' : ''
+              }`}
+              aria-disabled={isUrlPlaceholder ? 'true' : undefined}
+              onClick={isUrlPlaceholder ? handlePlaceholderClick : handleLinkClick}
             >
               <LiveIcon />
               Live ansehen
@@ -100,13 +119,22 @@ export function ProjectCardContent({ project, hasGh, hasUrl, techTags, onCardSur
   );
 }
 
-function ProjectLightboxPanel({ project, hasGh, hasUrl, techTags }) {
+function ProjectLightboxPanel({
+  project,
+  hasGh,
+  hasUrl,
+  isGhPlaceholder,
+  isUrlPlaceholder,
+  techTags,
+}) {
   return (
     <div className="project-lightbox-panel">
       <ProjectCardContent
         project={project}
         hasGh={hasGh}
         hasUrl={hasUrl}
+        isGhPlaceholder={isGhPlaceholder}
+        isUrlPlaceholder={isUrlPlaceholder}
         techTags={techTags}
         onCardSurface
       />
@@ -123,8 +151,10 @@ export default function ProjectCard({ project, images = [] }) {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [carouselTransitioning, setCarouselTransitioning] = useState(false);
 
-  const hasGh = project.gh && project.gh !== '#';
-  const hasUrl = project.url && project.url !== '#';
+  const hasGh = Boolean(project.gh);
+  const hasUrl = Boolean(project.url);
+  const isGhPlaceholder = project.gh === '#';
+  const isUrlPlaceholder = project.url === '#';
   const techTags = project.stack
     ? project.stack.split(',').map((s) => s.trim())
     : [];
@@ -250,6 +280,8 @@ export default function ProjectCard({ project, images = [] }) {
           project={project}
           hasGh={hasGh}
           hasUrl={hasUrl}
+          isGhPlaceholder={isGhPlaceholder}
+          isUrlPlaceholder={isUrlPlaceholder}
           techTags={techTags}
           onCardSurface
         />
@@ -308,6 +340,8 @@ export default function ProjectCard({ project, images = [] }) {
                   project={project}
                   hasGh={hasGh}
                   hasUrl={hasUrl}
+                  isGhPlaceholder={isGhPlaceholder}
+                  isUrlPlaceholder={isUrlPlaceholder}
                   techTags={techTags}
                 />
               </div>
@@ -324,6 +358,8 @@ export default function ProjectCard({ project, images = [] }) {
                 project={project}
                 hasGh={hasGh}
                 hasUrl={hasUrl}
+                isGhPlaceholder={isGhPlaceholder}
+                isUrlPlaceholder={isUrlPlaceholder}
                 techTags={techTags}
               />
             </div>
@@ -343,6 +379,8 @@ export default function ProjectCard({ project, images = [] }) {
                   project={project}
                   hasGh={hasGh}
                   hasUrl={hasUrl}
+                  isGhPlaceholder={isGhPlaceholder}
+                  isUrlPlaceholder={isUrlPlaceholder}
                   techTags={techTags}
                   onCardSurface
                 />

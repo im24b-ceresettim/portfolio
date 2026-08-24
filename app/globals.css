@@ -863,6 +863,107 @@ h2 {
   padding-top: 1rem;
 }
 
+.projects-section-carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  outline: none;
+}
+
+.projects-section-carousel--single {
+  padding-bottom: 0;
+}
+
+.projects-section-carousel-viewport {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.projects-section-carousel-viewport--transitioning {
+  overflow: visible;
+}
+
+.projects-section-carousel-clip {
+  overflow: hidden;
+  width: 100%;
+}
+
+.projects-section-carousel-track {
+  position: relative;
+  width: 100%;
+  min-height: 24rem;
+}
+
+.projects-section-carousel-track .project-carousel-slide {
+  width: 100%;
+}
+
+.projects-section-carousel-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.projects-section-carousel-slot--empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.projects-section-carousel-btn {
+  position: static;
+  transform: none;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.08);
+  color: #111;
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.projects-section-carousel-btn:hover {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+html.dark .projects-section-carousel-btn {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .projects-section-carousel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.projects-section-carousel-counter {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #666;
+}
+
+html.dark .projects-section-carousel-counter {
+  color: #a1a1aa;
+}
+
+@media (max-width: 720px) {
+  .projects-section-carousel-page {
+    grid-template-columns: 1fr;
+  }
+
+  .projects-section-carousel-track {
+    min-height: 20rem;
+  }
+}
+
 .project-card {
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -1193,6 +1294,37 @@ html.dark .project-btn.live-btn {
 html.dark .project-btn.live-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+.project-btn--placeholder {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.project-btn--placeholder:hover {
+  transform: none;
+}
+
+.project-btn.github-btn.project-btn--placeholder:hover {
+  background: #111;
+  color: #fff;
+}
+
+html.dark .project-btn.github-btn.project-btn--placeholder:hover {
+  background: #fff;
+  color: #000;
+}
+
+.project-btn.live-btn.project-btn--placeholder:hover {
+  background: transparent;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #111;
+}
+
+html.dark .project-btn.live-btn.project-btn--placeholder:hover {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.25);
   color: #fff;
 }
 
