@@ -55,7 +55,7 @@ export const projects = [
       'Interaktive Darstellung eines Planetensystems mit Fokus auf Visualisierung und Struktur.',
     stack: 'TypeScript, Three.js, React, HTML, CSS,',
     gh: 'https://github.com/im24b-ceresettim/Planetensystem',
-    url: '#'
+    url: 'https://planetensystem.vercel.app/'
   },
   {
     slug: 'sbb-lore',
