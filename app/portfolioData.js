@@ -2,7 +2,7 @@ export const portfolioData = {
   name: 'Matteo Ceresetti',
   role: 'Informatiker EFZ Applikationsentwicklung (Lehrstart August 2027)',
   headline:
-    'Ich besuche aktuell das zweite Jahr an der KSH Hottingen und suche eine Lehrstelle als Informatiker EFZ Applikationsentwicklung mit Start im August 2027. Ich arbeite strukturiert, zuverlässig und mit hoher Motivation, meine Fähigkeiten in einem professionellen Umfeld weiterzuentwickeln.',
+    'Ich besuche aktuell das dritte Jahr an der KSH Hottingen und suche eine Lehrstelle als Informatiker EFZ Applikationsentwicklung mit Start im August 2027. Ich arbeite strukturiert, zuverlässig und mit hoher Motivation, meine Fähigkeiten in einem professionellen Umfeld weiterzuentwickeln.',
   about:
     'Meine schulischen Schwerpunkte liegen in Informatik, Mathematik, Englisch, Französisch sowie Technik und Umwelt. Ich habe SCRUM-Grundlagen gelernt, arbeite effizient mit KI-Tools und bringe Teamgeist, Ruhe und Entschlossenheit mit. In meiner Freizeit spiele ich Fussball und trainiere Karate (blauer Gurt).',
   phone: '078 247 44 53',
