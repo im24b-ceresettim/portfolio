@@ -43,7 +43,7 @@ export const projects = [
     slug: 'Duck-Drift',
     title: 'Duck Drift',
     description:
-      'Für das zweite Hackathon entwickelte Projekt, welches die Motion-sensors des Handy benutzt, um ein damit gesteuertes Autospiel zu erstellem^n.',
+      'Für das zweite Hackathon entwickelte Projekt, welches die Motion-sensors des Handy benutzt, um ein damit gesteuertes Autospiel zu erstellen.',
     stack: 'Express.js, Websocket, Redis, Deplo.io, Python, JavaScript, HTML, CSS',
     gh: 'https://github.com/Lorenzo-Se/duck-drift',
     url: 'https://server.b206b21.deploio.app/',
